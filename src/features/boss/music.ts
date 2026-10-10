@@ -13,3 +13,5 @@ export const tracks: Track[] = [
 ];
 export const licenseUrl: Record<Track['license'], string> = { 'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/', 'CC-BY 3.0': 'https://creativecommons.org/licenses/by/3.0/' };
 export const trackFor = (id: string) => tracks.find(t => t.id === id);
+/** Background music for the shop (CC0, no attribution required; credited anyway on /credits). */
+export const shopTrack = { title: 'Town Theme RPG', author: 'cynicmusic', license: 'CC0' as const, page: 'https://opengameart.org/content/town-theme-rpg', file: '/audio/shop.mp3' };

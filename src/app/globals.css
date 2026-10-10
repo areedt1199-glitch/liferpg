@@ -631,3 +631,6 @@ button:disabled { opacity: .55; cursor: wait; }
 .boss-avatar.defeated { filter: grayscale(1); opacity: .6; }
 @media (max-width: 700px) { .arena-player { width: 20%; left: 6%; } .arena-boss { width: 36%; right: 4%; } }
 @media (prefers-reduced-motion: reduce) { .sprite.idle { animation: none; } }
+.market-music { position: absolute; top: 22px; left: 22px; z-index: 2; border: 2px solid var(--wood-l); background: #2a1a0ccc; color: #ffe38a; border-radius: 999px; padding: 4px 14px; min-height: 36px; font-size: 13px; font-weight: 700; }
+.market-music[aria-pressed="false"] { color: #c9b28a; }
+@media (max-width: 640px) { .market-music { position: static; justify-self: center; } }

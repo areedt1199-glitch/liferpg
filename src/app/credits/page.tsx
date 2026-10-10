@@ -1,5 +1,5 @@
 import { IntroPage } from '@/components/ui/intro-page';
-import { licenseUrl, tracks } from '@/features/boss/music';
+import { licenseUrl, shopTrack, tracks } from '@/features/boss/music';
 import { bosses } from '@/features/boss/catalog';
 
 export default function CreditsPage() {
@@ -15,8 +15,12 @@ export default function CreditsPage() {
       </li>)}</ol>
     </section>
     <section className="growth-card credits">
+      <h2>เพลงในร้านค้า</h2>
+      <p>“{shopTrack.title}” โดย {shopTrack.author} · <a href={licenseUrl[shopTrack.license]} target="_blank" rel="noopener noreferrer">{shopTrack.license}</a> · <a href={shopTrack.page} target="_blank" rel="noopener noreferrer">หน้าต้นฉบับ</a></p>
+    </section>
+    <section className="growth-card credits">
       <h2>ภาพบอสและฉาก</h2>
-      <p>บอส ตัวละคร และฉากหลังแบบพิกเซลทั้งหมดวาดด้วยโค้ดของ liferpg เอง ไม่ได้ใช้ไฟล์ภาพจากที่อื่น</p>
+      <p>ฉากหลัง บอส และสกินตัวละครเป็นภาพที่ทีม liferpg สร้างด้วย AI (Google Gemini) แล้วตัดพื้นหลังด้วยสคริปต์ของโปรเจกต์ ส่วนไอคอนน้ำยาและเอฟเฟกต์วาดด้วยโค้ด</p>
     </section>
     <section className="growth-card credits">
       <h2>แหล่งอ้างอิงของคำถาม</h2>

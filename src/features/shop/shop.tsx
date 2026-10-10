@@ -1,11 +1,13 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- pixel-art sprites/backdrops are small static files scaled by CSS */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { items, MAX_ITEM_QTY, rarities, skinImage, skinPrice, skins, STARTER_SKIN, type ItemId, type Skin } from './catalog';
 import { inventory } from '../journey/progress';
 import { purchaseItem, purchaseSkin, useProgress, wearSkin } from '../journey/progress-store';
 import { ProgressNotice } from '../journey/progress-notice';
 import { PixelPotion } from '../boss/pixel/pixel-canvas';
+import { shopTrack } from '../boss/music';
+import { usePref, writePref } from '../boss/prefs';
 
 type Pick = { kind: 'item'; id: ItemId } | { kind: 'skin'; id: string };
 const greetings = { item: 'เลือกน้ำยาได้เลย นักเดินทาง ทุกขวดหมักจากน้ำค้างกลางป่า', skin: 'อยากลองชุดใหม่หรือ? ใส่แล้วตัวละครของเจ้าจะเปลี่ยนไปทั้งแอป' };
@@ -19,6 +21,11 @@ export function Shop() {
   const [busy, setBusy] = useState(false);
   const [say, setSay] = useState(greetings.item);
   const bag = inventory(progress);
+  // Shop music starts on the first click inside the market (browsers block autoplay) and follows the music setting.
+  const music = usePref('liferpg.music', 'on', ['on', 'off'] as const), audio = useRef<HTMLAudioElement | null>(null);
+  function playMusic() { if (music !== 'on') return; audio.current ??= Object.assign(new Audio(shopTrack.file), { loop: true, volume: .35 }); void audio.current.play().catch(() => { /* waits for a gesture */ }); }
+  useEffect(() => { if (music === 'off') audio.current?.pause(); }, [music]);
+  useEffect(() => () => audio.current?.pause(), []);
   const item = pick.kind === 'item' ? items.find(i => i.id === pick.id)! : null;
   const skin = pick.kind === 'skin' ? skins.find(s => s.id === pick.id)! : null;
   const owned = (s: Skin) => skinPrice(s) === 0 || !!progress.skins[s.id];
@@ -43,8 +50,9 @@ export function Shop() {
   const disabled = !allowed || busy || (item ? short : !!skin && (progress.equippedSkinId === skin.id || (!owned(skin) && short)));
 
   return <><ProgressNotice />
-    <section className="market" aria-label="ร้านค้า">
+    <section className="market" aria-label="ร้านค้า" onClickCapture={playMusic}>
       <div className="market-sign"><p>THE FOREST MARKET</p><h2>ร้านค้าป่าเวทมนตร์</h2></div>
+      <button type="button" className="market-music" aria-pressed={music === 'on'} onClick={() => { const next = music === 'on' ? 'off' : 'on'; writePref('liferpg.music', next); if (next === 'off') audio.current?.pause(); }} title={`${shopTrack.title} · ${shopTrack.author} (${shopTrack.license})`}>{music === 'on' ? '♪ เพลง: เปิด' : '♪ เพลง: ปิด'}</button>
       <div className="market-purse" aria-live="polite"><span className="coin" aria-hidden="true" />{progress.coins.toLocaleString('th-TH')} เหรียญ</div>
 
       <div className="market-panel market-list">
