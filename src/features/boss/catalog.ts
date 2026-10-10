@@ -140,8 +140,11 @@ export const heartsFor = (boss: Boss) => 3 + Math.floor((boss.level - 1) / 3);
 
 // total = number of questions the result was graded against; legacy 3-question results keep total 3.
 export type BossResult = { score: number; total: number; attempts: number; passedAt: number | null };
-export function gradeBoss(questId: string, answers: Record<string, number>) {
+/** Number of correct answers. A partial set is allowed only when ×2 potions shortened the fight. */
+export function gradeBoss(questId: string, answers: Record<string, number>, partial = false) {
   const boss = bosses[questId];
-  if (!boss || !answers || typeof answers !== 'object' || Array.isArray(answers) || Object.keys(answers).length !== boss.questions.length || boss.questions.some(q => !Number.isInteger(answers[q.id]) || answers[q.id] < 0 || answers[q.id] >= q.options.length)) throw new Error('ตอบคำถามบอสให้ครบ');
-  return boss.questions.filter(q => answers[q.id] === q.answer).length;
+  if (!boss || !answers || typeof answers !== 'object' || Array.isArray(answers)) throw new Error('ตอบคำถามบอสให้ครบ');
+  const keys = Object.keys(answers), byId = new Map(boss.questions.map(q => [q.id, q]));
+  if ((partial ? keys.length < 1 || keys.length > boss.questions.length : keys.length !== boss.questions.length) || keys.some(k => { const q = byId.get(k); return !q || !Number.isInteger(answers[k]) || answers[k] < 0 || answers[k] >= q.options.length; })) throw new Error('ตอบคำถามบอสให้ครบ');
+  return keys.filter(k => answers[k] === byId.get(k)!.answer).length;
 }

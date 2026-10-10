@@ -54,7 +54,7 @@ test('SQL migrations, seed replay, RLS ownership, grants and helper restrictions
    await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
   await assert.rejects(()=>asUser(db,'',tx=>snapshot(tx)),/AUTH_REQUIRED/);
   const tables=(await db.query("select relname,relrowsecurity from pg_class join pg_namespace on pg_namespace.oid=relnamespace where nspname='public' and relkind='r'")).rows;
-  assert.equal(tables.length,18); assert.ok(tables.every(t=>t.relrowsecurity));
+  assert.equal(tables.length,23); assert.ok(tables.every(t=>t.relrowsecurity));
  } finally {await db.close();}
 });
 test('SQL atomic completion uses server rewards, checklist and unique ledger; retries preserve elapsed',async()=>{
@@ -69,7 +69,7 @@ test('SQL atomic completion uses server rewards, checklist and unique ledger; re
   assert.equal((await db.query('select count(*)::int as n from public.focus_sessions')).rows[0].n,1);
   await db.query("update public.focus_sessions set started_at=clock_timestamp()-interval '10 seconds' where user_id=$1",[A]);
   p=await asUser(db,A,tx=>command(tx,'complete',{questId:'tools',xp:999,userId:B,now:0}));
-  assert.equal(p.progress.totalXP,120);assert.equal(p.progress.coins,35);assert.equal(p.progress.activeQuestId,null);
+  assert.equal(p.progress.totalXP,120);assert.equal(p.progress.coins,105);assert.equal(p.progress.activeQuestId,null);
   assert.equal(p.progress.quests.variables,'available');assert.equal(p.progress.quests.loops,'locked');
   const elapsed=p.progress.focus.tools.totalMs;assert.ok(elapsed>=10000&&elapsed<20000);assert.equal(p.progress.focus.tools.round.status,'paused');
   const repeat=await asUser(db,A,tx=>command(tx,'complete',{questId:'tools'}));
@@ -95,46 +95,86 @@ test('SQL focus pause/resume/expiry/manual new and full journey preserve server 
   for(const id of ['tools','variables','loops','guess-number','improve-game','functions','high-score','publish-game']){
    await asUser(db,A,async tx=>{if(id!=='tools')await command(tx,'start_quest',{questId:id});await fullChecklistAndBoss(tx,id);await command(tx,'complete',{questId:id});});
   }
-  const final=await asUser(db,A,tx=>snapshot(tx));assert.equal(final.progress.totalXP,930);assert.equal(final.progress.coins,305);assert.ok(final.progress.goalCompletedAt);assert.equal(Object.keys(final.progress.rewards).length,8);
+  const final=await asUser(db,A,tx=>snapshot(tx));assert.equal(final.progress.totalXP,930);assert.equal(final.progress.coins,915);assert.ok(final.progress.goalCompletedAt);assert.equal(Object.keys(final.progress.rewards).length,8);
  }finally{await db.close();}
 });
 
-test('SQL growth purchases use latest funds, preserve quests and enforce owner-only access and AI quota',async()=>{
+test('SQL skins use latest funds, outfits are retired, owner-only access and AI quota',async()=>{
  const db=await database();try{
   await asUser(db,A,tx=>command(tx,'select_career',{careerId:'ui_ux_designer'}));
-  const initial=await asUser(db,A,tx=>snapshot(tx));assert.equal(initial.progress.careerId,'ui_ux_designer');assert.equal(initial.progress.version,6);
-  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise',coins:0})),/COINS_INSUFFICIENT/);
-  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'equip',{itemId:'sunrise'})),/ITEM_NOT_OWNED/);
-  await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});await command(tx,'start_quest',{questId:'tools'});await fullChecklistAndBoss(tx,'tools');await command(tx,'complete',{questId:'tools'});});
-  const bought=await asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise',coins:0,userId:B}));assert.equal(bought.progress.coins,5);assert.equal(bought.progress.totalXP,120);
-  const retry=await asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise'}));assert.deepEqual(retry.progress,bought.progress);
-  const equipped=await asUser(db,A,tx=>command(tx,'equip',{itemId:'sunrise'}));assert.equal(equipped.progress.equippedOutfitId,'sunrise');assert.equal(equipped.progress.quests.variables,'available');
-  const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.coins,0);assert.equal(Object.keys(b.progress.purchases).length,0);
-  assert.equal((await asUser(db,B,tx=>tx.query('select * from public.outfit_purchases where user_id=$1',[A]))).rows.length,0);
-  for(const sql of ["update public.outfit_catalog set price=0","delete from public.outfit_purchases","update public.user_progress set equipped_outfit_id='river'","select private.snapshot_core()"]){await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)));}
+  const initial=await asUser(db,A,tx=>snapshot(tx));assert.equal(initial.progress.careerId,'ui_ux_designer');assert.equal(initial.progress.version,7);assert.equal(initial.progress.equippedSkinId,'swordsman');
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise'})),/ITEM_RETIRED/);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'buy_skin',{skinId:'monk',coins:0})),/COINS_INSUFFICIENT/);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'equip_skin',{skinId:'monk'})),/SKIN_NOT_OWNED/);
+  await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});for(const id of ['tools','variables']){await command(tx,'start_quest',{questId:id});await fullChecklistAndBoss(tx,id);await command(tx,'complete',{questId:id});}});
+  const bought=await asUser(db,A,tx=>command(tx,'buy_skin',{skinId:'monk',coins:0,userId:B}));assert.equal(bought.progress.coins,15);assert.equal(bought.progress.skins.monk.coins,150);
+  const retry=await asUser(db,A,tx=>command(tx,'buy_skin',{skinId:'monk'}));assert.deepEqual(retry.progress,bought.progress);
+  const worn=await asUser(db,A,tx=>command(tx,'equip_skin',{skinId:'monk'}));assert.equal(worn.progress.equippedSkinId,'monk');assert.equal(worn.progress.quests.loops,'available');
+  const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.coins,0);assert.equal(Object.keys(b.progress.skins).length,0);
+  assert.equal((await asUser(db,B,tx=>tx.query('select * from public.skin_purchases where user_id=$1',[A]))).rows.length,0);
+  for(const sql of ["update public.skin_catalog set price=0","delete from public.skin_purchases","insert into public.item_purchases(user_id,item_id,qty,coins) values ('"+A+"','double',9,1)","update public.user_progress set equipped_skin_id='samurai'","select private.funds('"+A+"')","select private.snapshot_v6()"]){await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);}
   await asUser(db,A,tx=>tx.exec('select public.liferpg_reserve_ai()'));
   await assert.rejects(()=>asUser(db,A,tx=>tx.exec('select public.liferpg_reserve_ai()')),/AI_RATE_LIMIT/);
  }finally{await db.close();}
 });
 
+test('SQL potions: stock, use only in the active fight, x2 shortens the winning answer set for that battle only',async()=>{
+ const db=await database();try{
+  const bid='3f8fad5b-d9cb-469f-a165-70867728950e',other='4f8fad5b-d9cb-469f-a165-70867728950e';
+  await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});for(const id of ['tools','variables','loops','guess-number','improve-game','functions','high-score']){await command(tx,'start_quest',{questId:id});await fullChecklistAndBoss(tx,id);await command(tx,'complete',{questId:id});}});
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'buy_item',{itemId:'double',qty:2})),/COINS_INSUFFICIENT/);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'buy_item',{itemId:'hint',qty:10})),/QTY_INVALID/);
+  let p=await asUser(db,A,tx=>command(tx,'buy_item',{itemId:'hint',qty:2}));assert.equal(p.progress.coins,435);assert.equal(p.progress.itemPurchases[0].qty,2);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'use_item',{itemId:'hint',questId:'publish-game',battleId:bid})),/QUEST_NOT_ACTIVE/);
+  await asUser(db,A,tx=>command(tx,'start_quest',{questId:'publish-game'}));
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'use_item',{itemId:'hint',questId:'publish-game',battleId:'nope'})),/BATTLE_INVALID/);
+  await asUser(db,A,async tx=>{await command(tx,'use_item',{itemId:'hint',questId:'publish-game',battleId:bid});await command(tx,'use_item',{itemId:'hint',questId:'publish-game',battleId:bid});});
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'use_item',{itemId:'hint',questId:'publish-game',battleId:bid})),/ITEM_OUT_OF_STOCK/);
+  // Earn 315 more via practice days so a x2 potion (750) is affordable.
+  await asUser(db,A,tx=>command(tx,'select_career',{careerId:'game_developer'}));
+  for(let day=0;day<7;day++){await asUser(db,A,async tx=>{for(const t of ['learn_cpp','practice_unreal','mini_game_project'])await command(tx,'practice',{taskId:t});});
+   await db.query("update public.practice_log set practice_day=practice_day-1,completed_at=completed_at-interval '1 day' where user_id=$1",[A]);}
+  p=await asUser(db,A,tx=>command(tx,'buy_item',{itemId:'double',qty:1}));assert.equal(p.progress.coins,435+315-750);
+  await asUser(db,A,async tx=>{const {rows}=await tx.query("select id from public.quest_steps where quest_id='publish-game'");for(const r of rows)await command(tx,'check',{questId:'publish-game',stepId:r.id,checked:true});});
+  await asUser(db,A,tx=>command(tx,'use_item',{itemId:'double',questId:'publish-game',battleId:bid}));
+  const key=ANSWERS['publish-game'],ids=Object.keys(key),nine=Object.fromEntries(ids.slice(0,9).map(k=>[k,key[k]]));
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'publish-game',answers:nine,battleId:other})),/BOSS_ANSWERS_INVALID/);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'publish-game',answers:nine})),/BOSS_ANSWERS_INVALID/);
+  p=await asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'publish-game',answers:{...nine,[ids[0]]:(key[ids[0]]+1)%4},battleId:bid}));assert.equal(p.progress.bosses['publish-game'].passedAt,null);
+  p=await asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'publish-game',answers:nine,battleId:bid}));assert.ok(p.progress.bosses['publish-game'].passedAt);assert.equal(p.progress.bosses['publish-game'].score,10);
+  assert.equal(p.progress.itemUses.length,3);
+  const bView=await asUser(db,B,tx=>tx.query('select * from public.item_uses where user_id=$1',[A]));assert.equal(bView.rows.length,0);
+ }finally{await db.close();}
+});
+
+test('SQL shop upgrade triples earned coins and refunds outfit purchases',async()=>{
+ const db=await database('20261011140000');
+ try{
+  await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});await command(tx,'start_quest',{questId:'tools'});await fullChecklistAndBoss(tx,'tools');await command(tx,'complete',{questId:'tools'});await command(tx,'purchase',{itemId:'sunrise'});await command(tx,'equip',{itemId:'sunrise'});});
+  assert.equal((await asUser(db,A,tx=>snapshot(tx))).progress.coins,5);
+  await db.exec(fs.readFileSync('supabase/migrations/20261011140000_shop_v2.sql','utf8'));await loadAnswers(db);
+  const p=await asUser(db,A,tx=>snapshot(tx));
+  assert.equal(p.progress.version,7);assert.equal(p.progress.coins,105);assert.equal(p.progress.rewards.tools.coins,105);assert.equal(p.progress.equippedSkinId,'swordsman');assert.equal(p.progress.purchases,undefined);
+ }finally{await db.close();}
+});
 test('SQL daily practice uses server day and rewards, caps per day, and coins are spendable',async()=>{
  const db=await database();try{
   await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp'})),/PRACTICE_CAREER_REQUIRED/);
   await asUser(db,A,tx=>command(tx,'select_career',{careerId:'game_developer'}));
   await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'not-a-task'})),/PRACTICE_TASK_INVALID/);
   let p=await asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp',xp:999,day:'2000-01-01'}));
-  assert.equal(p.progress.version,6);assert.equal(p.progress.totalXP,10);assert.equal(p.progress.coins,5);
+  assert.equal(p.progress.version,7);assert.equal(p.progress.totalXP,10);assert.equal(p.progress.coins,15);
   const retry=await asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp'}));assert.deepEqual(retry.progress,p.progress);
   await asUser(db,A,async tx=>{await command(tx,'practice',{taskId:'practice_unreal'});await command(tx,'practice',{taskId:'mini_game_project'});});
   await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'programming_challenge'})),/PRACTICE_LIMIT/);
   // Yesterday's entries do not count toward today's cap; funds include practice coins.
   await db.query("update public.practice_log set practice_day=practice_day-1,completed_at=completed_at-interval '1 day' where user_id=$1",[A]);
   await asUser(db,A,async tx=>{for(const id of ['learn_cpp','practice_unreal','programming_challenge'])await command(tx,'practice',{taskId:id});});
-  p=await asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise'}));assert.equal(p.progress.coins,0);assert.equal(p.progress.totalXP,60);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'buy_item',{itemId:'hint',qty:1})),/COINS_INSUFFICIENT/);p=await asUser(db,A,tx=>snapshot(tx));assert.equal(p.progress.coins,90);assert.equal(p.progress.totalXP,60);
   assert.equal(Object.keys(p.progress.practice).length,6);
   const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.totalXP,0);assert.deepEqual(b.progress.practice,{});
   assert.equal((await asUser(db,B,tx=>tx.query('select * from public.practice_log where user_id=$1',[A]))).rows.length,0);
-  for(const sql of ["delete from public.practice_log",`insert into public.practice_log values('${A}',current_date,'game_developer','learn_cpp',now(),10,5)`,"select private.growth_core('purchase','{}'::jsonb)","select private.snapshot_boss()"])await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
+  for(const sql of ["delete from public.practice_log",`insert into public.practice_log values('${A}',current_date,'game_developer','learn_cpp',now(),10,15)`,"select private.growth_core('purchase','{}'::jsonb)","select private.snapshot_boss()"])await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
  }finally{await db.close();}
 });
 test('SQL 8-level upgrade keeps finished players progress and reopens at level 6; boss totals scale per level',async()=>{

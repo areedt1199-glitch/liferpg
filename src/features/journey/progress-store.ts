@@ -1,6 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
-import { initialProgress, parseProgress, selectGoal, startQuest, updateChecklist, updateRound, completeQuest, selectCareer, purchaseOutfit, equipOutfit, type UserProgress } from "./progress";
+import { initialProgress, parseProgress, selectGoal, startQuest, updateChecklist, updateRound, completeQuest, selectCareer, buySkin, equipSkin, buyItem, consumeItem, type UserProgress } from "./progress";
 import {attemptBoss,attachEvidence,detachEvidence,completePractice} from './progress';
 import type {EvidenceRecord} from '../evidence/types';
 export const STORAGE_KEY = "liferpg.progress.v1";
@@ -93,10 +93,13 @@ export function setStepChecked(questId:string,stepId:string,checked:boolean) {re
 export function controlRound(questId:string,action:'start'|'pause'|'resume'|'new'|'finish') {return commit(action,{questId},p=>updateRound(p,questId,action,Date.now()));}
 export function confirmQuest(questId:string) {return commit('complete',{questId},p=>completeQuest(p,questId,Date.now()));}
 export function chooseCareer(careerId:string){return commit('select_career',{careerId},p=>selectCareer(p,careerId));}
-export function buyOutfit(itemId:string){return commit('purchase',{itemId},p=>purchaseOutfit(p,itemId,Date.now()));}
-export function wearOutfit(itemId:string){return commit('equip',{itemId},p=>equipOutfit(p,itemId));}
+export function purchaseSkin(skinId:string){return commit('buy_skin',{skinId},p=>buySkin(p,skinId,Date.now()));}
+export function wearSkin(skinId:string){return commit('equip_skin',{skinId},p=>equipSkin(p,skinId));}
+export function purchaseItem(itemId:string,qty:number){return commit('buy_item',{itemId,qty},p=>buyItem(p,itemId,qty,Date.now(),crypto.randomUUID()));}
+/** Spends one potion in the given fight; the battle UI applies the effect only after this succeeds. */
+export function spendItem(itemId:string,questId:string,battleId:string){return commit('use_item',{itemId,questId,battleId},p=>consumeItem(p,itemId,questId,battleId,Date.now()));}
 export function practiceTask(taskId:string){return commit('practice',{taskId},p=>completePractice(p,taskId,Date.now()));}
-export function submitBoss(questId:string,answers:Record<string,number>){return commit('boss_attempt',{questId,answers},p=>attemptBoss(p,questId,answers,Date.now()));}
+export function submitBoss(questId:string,answers:Record<string,number>,battleId=''){return commit('boss_attempt',{questId,answers,battleId},p=>attemptBoss(p,questId,answers,Date.now(),battleId));}
 export function saveDemoEvidence(record:EvidenceRecord){if(snapshot.mode!=='demo')return Promise.resolve(false);return demoCommit(p=>attachEvidence(p,record));}
 export function removeDemoEvidence(questId:string){if(snapshot.mode!=='demo')return Promise.resolve(false);return demoCommit(p=>detachEvidence(p,questId));}
 export function reloadProgress() {return readStorage();}

@@ -1,8 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- pixel-art sprites/backdrops are small static files scaled by CSS */
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { SceneId, SpriteId } from '../catalog';
 import type { Mode } from './engine';
-import { BOSS_SIZE, PLAYER_SIZE, drawBoss, drawPlayer, outlineOf } from './sprites';
+import { BOSS_SIZE, PLAYER_SIZE, POTION_SIZE, drawBoss, drawPlayer, drawPotion, outlineOf } from './sprites';
 import { SCENE_H, SCENE_W, particles } from './scenes';
 
 const REDUCED = '(prefers-reduced-motion: reduce)';
@@ -32,8 +33,14 @@ export function PixelScene({ scene, level, className }: { scene: SceneId; level:
   const ref = useRef<HTMLCanvasElement>(null), frame = useFrame(160, true);
   useEffect(() => { const ctx = ref.current?.getContext('2d'); if (!ctx) return; ctx.clearRect(0, 0, SCENE_W, SCENE_H); particles(ctx, scene, frame); }, [scene, frame]);
   return <div className={`scene-${scene} ${className ?? ''}`} aria-hidden="true">
-    {/* eslint-disable-next-line @next/next/no-img-element -- small static backdrop, scaled by CSS */}
+    
     <img src={`/images/battle/lv${level}.jpg`} alt="" className="scene-art" />
     <canvas ref={ref} width={SCENE_W} height={SCENE_H} className="pixel scene-fx" />
   </div>;
+}
+
+export function PixelPotion({ kind, liquid, className }: { kind: 'hint' | 'heart' | 'reveal' | 'double'; liquid: string; className?: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => { const ctx = ref.current?.getContext('2d'); if (ctx) drawPotion(kind, liquid).draw(ctx); }, [kind, liquid]);
+  return <canvas ref={ref} width={POTION_SIZE} height={POTION_SIZE} className={`pixel ${className ?? ''}`} aria-hidden="true" />;
 }

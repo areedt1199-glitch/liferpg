@@ -17,12 +17,12 @@ function loadRules(file, dependencies = {}, environment = {}) {
 }
 const definitions = loadRules("src/features/journey/definitions.ts");
 const focusRules = loadRules("src/features/focus/rules.ts");
-const wardrobe=loadRules('src/features/wardrobe/catalog.ts');
+const shopCatalog=loadRules('src/features/shop/catalog.ts');
 const careers=JSON.parse(fs.readFileSync('src/features/careers/catalog.json','utf8'));
 const bossRules=loadRules('src/features/boss/catalog.ts');
 const evidenceRules=loadRules('src/features/evidence/types.ts');
 const chartRules=loadRules('src/features/analytics/rules.ts');
-const rules = loadRules("src/features/journey/progress.ts", { '../analytics/rules':chartRules, "./definitions": definitions, "../focus/rules": focusRules, '../careers/catalog.json':{default:careers}, '../wardrobe/catalog':wardrobe,'../boss/catalog':bossRules,'../evidence/types':evidenceRules });
+const rules = loadRules("src/features/journey/progress.ts", { '../analytics/rules':chartRules, "./definitions": definitions, "../focus/rules": focusRules, '../careers/catalog.json':{default:careers}, '../shop/catalog':shopCatalog,'../boss/catalog':bossRules,'../evidence/types':evidenceRules });
 
 test("PostgreSQL jsonb key ordering does not invalidate a fresh account snapshot", () => {
   const progress = rules.initialProgress();
@@ -75,7 +75,7 @@ test("invalid focus ledger and step IDs are rejected; countdown cannot become ne
 test("version 1 migration preserves active quest and initializes stable checklist IDs", () => {
   const old = { version: 1, selectedGoalId: "first-game", activeQuestId: "tools", quests: { tools: "in_progress", variables: "locked", loops: "locked", "guess-number": "locked", "improve-game": "locked" } };
   const migrated = rules.parseProgress(JSON.stringify(old));
-  assert.equal(migrated.version, 6);
+  assert.equal(migrated.version, 7);
   assert.equal(migrated.activeQuestId, "tools");
   assert.equal(migrated.focus.tools.round.status, "idle");
   assert.equal(migrated.focus.tools.totalMs, 0);
@@ -260,7 +260,7 @@ test("eight quests unlock sequentially and complete goal without bonus or auto s
     assert.equal(Object.keys(p.rewards).length, index + 1);
     p = rules.parseProgress(JSON.stringify(p));
   }
-  assert.equal(p.goalCompletedAt, 1007); assert.equal(p.totalXP, 930); assert.equal(p.coins, 305);
+  assert.equal(p.goalCompletedAt, 1007); assert.equal(p.totalXP, 930); assert.equal(p.coins, 915);
   assert.equal(Object.values(p.quests).every(s => s === "completed"), true);
 });
 test("level boundaries and jumps use total XP", () => {
@@ -277,7 +277,7 @@ test("version 2 migration preserves running round, checklist and active quest wi
   p = rules.updateRound(p,"tools","resume",21000);
   const old = { version:2, selectedGoalId:p.selectedGoalId, activeQuestId:p.activeQuestId, quests:p.quests, focus:p.focus };
   const migrated = rules.parseProgress(JSON.stringify(old));
-  assert.equal(migrated.version,6); assert.equal(migrated.totalXP,0); assert.equal(migrated.coins,0);
+  assert.equal(migrated.version,7); assert.equal(migrated.totalXP,0); assert.equal(migrated.coins,0);
   assert.equal(Object.keys(migrated.rewards).length,0);
   assert.equal(JSON.stringify(migrated.focus),JSON.stringify(old.focus));
   assert.equal(migrated.activeQuestId,"tools");
@@ -369,37 +369,69 @@ test("same-origin requests and Auth redirects preserve 127.0.0.1 when Next norma
 test('career selection preserves active progress and schema3 migration preserves rewards and focus',()=>{
  let p=rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools');
  p=rules.updateChecklist(p,'tools','hello-world',true);
- const old={...p,version:3};delete old.careerId;delete old.equippedOutfitId;delete old.purchases;
+ const old={...p,version:3};for(const k of ['careerId','equippedSkinId','skins','itemPurchases','itemUses'])delete old[k];
  const upgraded=rules.parseProgress(JSON.stringify(old));
- assert.equal(upgraded.activeQuestId,'tools');assert.deepEqual(JSON.stringify(upgraded.focus),JSON.stringify(p.focus));assert.equal(upgraded.equippedOutfitId,'forest');
+ assert.equal(upgraded.activeQuestId,'tools');assert.deepEqual(JSON.stringify(upgraded.focus),JSON.stringify(p.focus));assert.equal(upgraded.equippedSkinId,'swordsman');
  const selected=rules.selectCareer(upgraded,'ui_ux_designer');assert.equal(selected.careerId,'ui_ux_designer');assert.equal(selected.activeQuestId,'tools');
  assert.throws(()=>rules.selectCareer(selected,'unknown'));assert.equal(rules.parseProgress(JSON.stringify(selected)).careerId,'ui_ux_designer');
 });
 
-test('outfits require earned coins, purchases are idempotent and equips require ownership',()=>{
+test('skins require earned coins; purchases are idempotent and equips require ownership',()=>{
  let p=rules.selectGoal(rules.initialProgress(),'first-game');
- assert.throws(()=>rules.purchaseOutfit(p,'sunrise',1000));assert.throws(()=>rules.equipOutfit(p,'sunrise'));
+ assert.throws(()=>rules.buySkin(p,'monk',1000),/เหรียญไม่พอ/);assert.throws(()=>rules.equipSkin(p,'monk'));assert.equal(rules.equipSkin(p,'swordsman').equippedSkinId,'swordsman');
  p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,'tools'),'tools'),'tools',1000);
- p=rules.purchaseOutfit(p,'sunrise',2000);assert.equal(p.coins,5);assert.equal(p.totalXP,120);
- assert.equal(rules.purchaseOutfit(p,'sunrise',3000),p);
- p=rules.equipOutfit(p,'sunrise');assert.equal(rules.parseProgress(JSON.stringify(p)).equippedOutfitId,'sunrise');
- p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,'variables'),'variables'),'variables',4000);assert.equal(p.coins,25);
- const corrupt=JSON.parse(JSON.stringify(p));corrupt.purchases.sunrise.coins=0;assert.throws(()=>rules.parseProgress(JSON.stringify(corrupt)));
+ p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,'variables'),'variables'),'variables',1500);assert.equal(p.coins,165);
+ p=rules.buySkin(p,'monk',2000);assert.equal(p.coins,15);assert.equal(rules.buySkin(p,'monk',3000),p);
+ p=rules.equipSkin(p,'monk');assert.equal(rules.parseProgress(JSON.stringify(p)).equippedSkinId,'monk');
+ assert.throws(()=>rules.buyItem(p,'hint',1,3000,'a'),/เหรียญไม่พอ/);
+ const corrupt=JSON.parse(JSON.stringify(p));corrupt.skins.monk.coins=0;assert.throws(()=>rules.parseProgress(JSON.stringify(corrupt)));
+ const unowned=JSON.parse(JSON.stringify(p));unowned.equippedSkinId='samurai';assert.throws(()=>rules.parseProgress(JSON.stringify(unowned)));
 });
 
-test('two demo tabs buy same outfit once and failed write does not claim ownership',async()=>{
- let p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools'),'tools'),'tools',1000);
- let raw=JSON.stringify(p),writes=0,queue=Promise.resolve();const storage={getItem:()=>raw,setItem:(key,value)=>{raw=value;writes++;}};
- const locks={request:(name,callback)=>{const pending=queue.then(callback);queue=pending.catch(()=>{});return pending;}};
- const a=testStore(storage,{locks}),b=testStore(storage,{locks});await Promise.all([a.buyOutfit('sunrise'),b.buyOutfit('sunrise')]);
- assert.equal(writes,1);assert.equal(rules.parseProgress(raw).coins,5);
- const failed=testStore({getItem:()=>JSON.stringify(p),setItem:()=>{throw Error('quota');}});assert.equal(await failed.buyOutfit('sunrise'),false);assert.equal(failed.useProgress().progress.coins,35);assert.equal(Object.keys(failed.useProgress().progress.purchases).length,0);
+test('potions: bought in stacks, spent one at a time inside the active fight, never below zero',()=>{
+ let p=rules.selectGoal(rules.initialProgress(),'first-game');
+ for(const [i,q] of definitions.journeyDefinition.quests.slice(0,4).entries())p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,q.id),q.id),q.id,1000+i);
+ assert.equal(p.coins,330);
+ p=rules.buyItem(p,'hint',2,2000,'buy-1');assert.equal(p.coins,30);assert.equal(rules.inventory(p).hint,2);
+ assert.throws(()=>rules.buyItem(p,'hint',0,2000,'x'));assert.throws(()=>rules.buyItem(p,'hint',10,2000,'x'));assert.throws(()=>rules.buyItem(p,'potion',1,2000,'x'));
+ const battle='0f8fad5b-d9cb-469f-a165-70867728950e';
+ assert.throws(()=>rules.consumeItem(p,'hint','improve-game',battle,2100),/ระหว่างสู้บอส/);
+ p=fullyChecked(rules.startQuest(p,'improve-game'),'improve-game');
+ p=rules.consumeItem(p,'hint','improve-game',battle,2200);p=rules.consumeItem(p,'hint','improve-game',battle,2300);
+ assert.equal(rules.inventory(p).hint,0);assert.throws(()=>rules.consumeItem(p,'hint','improve-game',battle,2400),/ไม่มีไอเทม/);
+ const back=rules.parseProgress(JSON.stringify(p));assert.equal(back.itemUses.length,2);assert.equal(back.coins,30);
+ const over=JSON.parse(JSON.stringify(p));over.itemUses.push({...over.itemUses[0]});assert.throws(()=>rules.parseProgress(JSON.stringify(over)),/มากกว่าที่มี/);
+ const cheap=JSON.parse(JSON.stringify(p));cheap.itemPurchases[0].coins=1;assert.throws(()=>rules.parseProgress(JSON.stringify(cheap)));
+});
+
+test('x2 potions drunk in this fight let a shorter answer set win; other fights do not count',()=>{
+ let p=rules.selectGoal(rules.initialProgress(),'first-game');
+ for(const [i,q] of definitions.journeyDefinition.quests.slice(0,7).entries())p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,q.id),q.id),q.id,1000+i);
+ p=rules.completePractice(rules.selectCareer(p,'english'),careers.find(c=>c.id==='english').tasks[0].id,1500);assert.equal(p.coins,750);
+ p=rules.buyItem(p,'double',1,2000,'buy-d');assert.equal(p.coins,0);p=fullyChecked(rules.startQuest(p,'publish-game'),'publish-game');
+ const qs=bossRules.bosses['publish-game'].questions,n=qs.length,battle='1f8fad5b-d9cb-469f-a165-70867728950e',other='2f8fad5b-d9cb-469f-a165-70867728950e';
+ const answers=Object.fromEntries(qs.slice(0,n-1).map(q=>[q.id,q.answer]));
+ assert.throws(()=>rules.attemptBoss(p,'publish-game',answers,3000,battle),/ครบ/);
+ p=rules.consumeItem(p,'double','publish-game',battle,3100);
+ assert.throws(()=>rules.attemptBoss(p,'publish-game',answers,3200,other),/ครบ/);
+ const won=rules.attemptBoss(p,'publish-game',answers,3300,battle);assert.equal(won.bosses['publish-game'].passedAt,3300);assert.equal(won.bosses['publish-game'].score,n);
+ const wrong={...answers,[qs[0].id]:(qs[0].answer+1)%qs[0].options.length};
+ const lost=rules.attemptBoss(p,'publish-game',wrong,3400,battle);assert.equal(lost.bosses['publish-game'].passedAt,null);assert.ok(lost.bosses['publish-game'].score<n);
+});
+
+test('legacy coins are tripled and outfit purchases refunded when loading an older snapshot',()=>{
+ const p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools'),'tools'),'tools',1000);
+ const legacy=JSON.parse(JSON.stringify(p));legacy.version=6;legacy.rewards.tools.coins=35;legacy.coins=5;legacy.purchases={sunrise:{itemId:'sunrise',coins:30,purchasedAt:1100}};legacy.equippedOutfitId='sunrise';
+ for(const k of ['equippedSkinId','skins','itemPurchases','itemUses'])delete legacy[k];
+ const up=rules.parseProgress(JSON.stringify(legacy));
+ assert.equal(up.version,7);assert.equal(up.rewards.tools.coins,105);assert.equal(up.coins,105);assert.equal(up.equippedSkinId,'swordsman');assert.equal(Object.keys(up.skins).length,0);
 });
 
 test('Bangkok daily charts use earned rewards and do not subtract purchases',()=>{
  const chart=loadRules('src/features/analytics/rules.ts');let p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools'),'tools'),'tools',Date.parse('2026-10-08T17:01:00Z'));
- p=rules.purchaseOutfit(p,'sunrise',Date.parse('2026-10-08T17:02:00Z'));
- const buckets=chart.progressBuckets(p,7,Date.parse('2026-10-09T04:00:00Z'));assert.equal(buckets.length,7);assert.equal(buckets[6].date,'2026-10-09');assert.equal(buckets[6].xp,120);assert.equal(buckets[6].coins,35);assert.equal(p.coins,5);
+ p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,'variables'),'variables'),'variables',Date.parse('2026-10-08T17:01:30Z'));
+ p=rules.buyItem(p,'hint',1,Date.parse('2026-10-08T17:02:00Z'),'b1');
+ const buckets=chart.progressBuckets(p,7,Date.parse('2026-10-09T04:00:00Z'));assert.equal(buckets.length,7);assert.equal(buckets[6].date,'2026-10-09');assert.equal(buckets[6].xp,200);assert.equal(buckets[6].coins,165);assert.equal(p.coins,15);
 });
 
 test('local lesson assistant retrieves authored content and reports unknown topics without fabricating',()=>{
@@ -419,15 +451,15 @@ test('daily practice rewards once per task per Bangkok day, caps at three and bu
  p=rules.completePractice(p,tasks[0],day('2026-10-09T17:01:00Z'));
  p=rules.completePractice(p,tasks[1],day('2026-10-10T01:00:00Z'));p=rules.completePractice(p,tasks[2],day('2026-10-10T02:00:00Z'));
  assert.throws(()=>rules.completePractice(p,tasks[3],day('2026-10-10T03:00:00Z')),/ครบ 3/);
- assert.equal(p.totalXP,40);assert.equal(p.coins,20);assert.equal(rules.practiceToday(p,day('2026-10-10T05:00:00Z')).length,3);
+ assert.equal(p.totalXP,40);assert.equal(p.coins,60);assert.equal(rules.practiceToday(p,day('2026-10-10T05:00:00Z')).length,3);
  assert.equal(rules.practiceStreak(p,day('2026-10-10T05:00:00Z')),2);
  assert.equal(rules.practiceStreak(p,day('2026-10-11T05:00:00Z')),2,'today not practised yet keeps yesterday streak');
  assert.equal(rules.practiceStreak(p,day('2026-10-12T05:00:00Z')),0);
  const parsed=rules.parseProgress(JSON.stringify(p));assert.deepEqual(parsed.practice,p.practice);assert.equal(parsed.totalXP,40);
  // Practice coins are spendable and quest totalXPBefore stays ledger-only.
- assert.throws(()=>rules.purchaseOutfit(p,'sunrise',day('2026-10-10T06:00:00Z')),/เหรียญไม่พอ/);
+ assert.throws(()=>rules.buySkin(p,'monk',day('2026-10-10T06:00:00Z')),/เหรียญไม่พอ/);
  const q=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(p,'first-game'),'tools'),'tools'),'tools',day('2026-10-10T07:00:00Z'));
- assert.equal(q.rewards.tools.totalXPBefore,0);assert.equal(q.totalXP,160);assert.equal(rules.parseProgress(JSON.stringify(rules.purchaseOutfit(q,'sunrise',day('2026-10-10T07:30:00Z')))).coins,25);assert.equal(rules.parseProgress(JSON.stringify(q)).totalXP,160);
+ assert.equal(q.rewards.tools.totalXPBefore,0);assert.equal(q.totalXP,160);assert.equal(rules.parseProgress(JSON.stringify(rules.buySkin(q,'monk',day('2026-10-10T07:30:00Z')))).coins,15);assert.equal(rules.parseProgress(JSON.stringify(q)).totalXP,160);
  const key=Object.keys(p.practice)[0];
  for(const bad of [{...p.practice[key],xp:99},{...p.practice[key],day:'2026-01-01'},{...p.practice[key],taskId:'learn_cpp'}])
   assert.throws(()=>rules.parseProgress(JSON.stringify({...q,practice:{...q.practice,[key]:bad}})));
@@ -498,4 +530,14 @@ test('turn-based battle: wrong answers cost hearts and requeue; victory yields a
  const h=battleRules.applyHint(battleRules.startBattle(boss,rand),boss,rand);const hq=boss.questions[h.current];
  assert.equal(h.hint,0);assert.notEqual(h.removed,hq.answer);assert.ok(h.removed>=0&&h.removed<hq.options.length);
  assert.equal(battleRules.applyHint(h,boss,rand),h);
+});
+
+test('two demo tabs buy the same skin once and a failed write does not claim ownership',async()=>{
+ let p=rules.selectGoal(rules.initialProgress(),'first-game');
+ for(const id of ['tools','variables'])p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,id),id),id,1000);
+ let raw=JSON.stringify(p),writes=0,queue=Promise.resolve();const storage={getItem:()=>raw,setItem:(key,value)=>{raw=value;writes++;}};
+ const locks={request:(name,callback)=>{const pending=queue.then(callback);queue=pending.catch(()=>{});return pending;}};
+ const a=testStore(storage,{locks}),b=testStore(storage,{locks});await Promise.all([a.purchaseSkin('monk'),b.purchaseSkin('monk')]);
+ assert.equal(writes,1);assert.equal(rules.parseProgress(raw).coins,15);
+ const failed=testStore({getItem:()=>JSON.stringify(p),setItem:()=>{throw Error('quota');}});assert.equal(await failed.purchaseSkin('monk'),false);assert.equal(failed.useProgress().progress.coins,165);assert.equal(Object.keys(failed.useProgress().progress.skins).length,0);
 });

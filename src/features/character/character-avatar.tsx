@@ -1,7 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- pixel-art sprites/backdrops are small static files scaled by CSS */
 import { useProgress } from '../journey/progress-store';
-import { outfits } from '../wardrobe/catalog';
-export function CharacterAvatar({ small = false, outfitId }: { small?: boolean; outfitId?:string }) {
-  const {progress}=useProgress();const outfit=outfits.find(i=>i.id===(outfitId??progress.equippedOutfitId))??outfits[0];
-  return <div className={`character-placeholder ${small ? "avatar-small" : ""}`} role="img" aria-label={`ตัวละครสวม${outfit.title}`}><div className="character-head" /><div className="character-cloak" style={{background:outfit.color,borderBottomColor:outfit.trim}}/><div className="character-shadow" /></div>;
+import { STARTER_SKIN, skinById, skinImage } from '../shop/catalog';
+/** The equipped skin (or a given one) as a framed pixel portrait. */
+export function CharacterAvatar({ small = false, skinId }: { small?: boolean; skinId?: string }) {
+  const { progress } = useProgress(); const skin = skinById(skinId ?? progress.equippedSkinId) ?? skinById(STARTER_SKIN)!;
+  return <div className={`character-portrait ${small ? 'portrait-small' : ''}`} role="img" aria-label={`ตัวละครสกิน${skin.name}`}><img src={skinImage(skin.id)} alt="" /></div>;
 }
