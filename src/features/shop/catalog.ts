@@ -20,27 +20,20 @@ export const rarities: Record<Rarity, { label: string; price: number; color: str
   legendary: { label: 'ตำนาน', price: 800, color: '#e0a530' },
 };
 export type Skin = { id: string; name: string; rarity: Rarity };
-// Order follows the generated sheet; images live in public/images/skins/<id>.png (cut by scripts/skin-boxes.txt).
+// Order follows the generated sheet (assets-src/skins-v2.png); images are cut by scripts/cut-sprites.mjs into public/images/skins/<id>.png.
 export const skins: Skin[] = [
-  { id: 'swordsman', name: 'นักดาบฝึกหัด', rarity: 'starter' }, { id: 'knight', name: 'อัศวินเหล็ก', rarity: 'rare' },
-  { id: 'rogue', name: 'นักย่องเบา', rarity: 'rare' }, { id: 'archer', name: 'นักธนูป่า', rarity: 'rare' },
-  { id: 'mage', name: 'นักเวทม่วง', rarity: 'rare' }, { id: 'sorceress', name: 'แม่มดนักอ่าน', rarity: 'rare' },
-  { id: 'priestess', name: 'นักบวชหญิง', rarity: 'epic' }, { id: 'paladin', name: 'อัศวินศักดิ์สิทธิ์', rarity: 'legendary' },
-  { id: 'monk', name: 'นักพรต', rarity: 'common' }, { id: 'veteran', name: 'ทหารผ่านศึก', rarity: 'rare' },
-  { id: 'bard', name: 'นักกวีพเนจร', rarity: 'common' }, { id: 'barbarian', name: 'นักรบเถื่อน', rarity: 'rare' },
-  { id: 'ranger', name: 'พรานหน้าไม้', rarity: 'rare' }, { id: 'seer', name: 'ผู้หยั่งรู้', rarity: 'epic' },
-  { id: 'assassin', name: 'มือสังหารเงา', rarity: 'epic' }, { id: 'samurai', name: 'ซามูไร', rarity: 'legendary' },
-  { id: 'elf', name: 'เอลฟ์นักธนู', rarity: 'rare' }, { id: 'dwarf', name: 'คนแคระขวานเหล็ก', rarity: 'rare' },
-  { id: 'orc', name: 'ออร์ค', rarity: 'rare' }, { id: 'gnome', name: 'โนมนักประดิษฐ์', rarity: 'rare' },
-  { id: 'minotaur', name: 'มิโนทอร์', rarity: 'epic' }, { id: 'naga', name: 'นาคี', rarity: 'epic' },
-  { id: 'fairy', name: 'ภูตจิ๋ว', rarity: 'epic' }, { id: 'peasant', name: 'ชาวบ้าน', rarity: 'common' },
-  { id: 'farmer', name: 'ชาวนา', rarity: 'common' }, { id: 'blacksmith', name: 'ช่างตีเหล็ก', rarity: 'common' },
-  { id: 'elder', name: 'ผู้เฒ่า', rarity: 'common' }, { id: 'maiden', name: 'สาวชาวบ้าน', rarity: 'common' },
-  { id: 'boy', name: 'เด็กชาย', rarity: 'common' }, { id: 'guard', name: 'ยามประตู', rarity: 'common' },
-  { id: 'goblin', name: 'ก็อบลิน', rarity: 'common' }, { id: 'skeleton', name: 'โครงกระดูกนักดาบ', rarity: 'rare' },
-  { id: 'slime', name: 'สไลม์', rarity: 'common' }, { id: 'zombie', name: 'ซอมบี้', rarity: 'common' },
-  { id: 'bandit', name: 'โจรป่า', rarity: 'common' }, { id: 'wolf', name: 'หมาป่าเทา', rarity: 'rare' },
-  { id: 'shadow', name: 'ผู้คลุมม่วง', rarity: 'epic' },
+  { id: 'swordsman', name: 'นักดาบฝึกหัด', rarity: 'starter' }, { id: 'knight', name: 'อัศวินขนนกแดง', rarity: 'rare' },
+  { id: 'archer', name: 'นักธนูป่า', rarity: 'rare' }, { id: 'wizard', name: 'พ่อมดหมวกม่วง', rarity: 'epic' },
+  { id: 'priest', name: 'นักบวชแสง', rarity: 'rare' }, { id: 'ninja', name: 'นินจาเงา', rarity: 'epic' },
+  { id: 'samurai', name: 'ซามูไรเกราะดำ', rarity: 'legendary' }, { id: 'elf', name: 'เอลฟ์ผู้พิทักษ์ป่า', rarity: 'rare' },
+  { id: 'dwarf', name: 'คนแคระขวานเหล็ก', rarity: 'rare' }, { id: 'valkyrie', name: 'นักรบหญิงโล่เงิน', rarity: 'rare' },
+  { id: 'rogue', name: 'นักฆ่าผ้าคลุมดำ', rarity: 'epic' }, { id: 'bard', name: 'นักกวีพเนจร', rarity: 'common' },
+  { id: 'monk', name: 'นักพรตจีวรส้ม', rarity: 'common' }, { id: 'paladin', name: 'อัศวินศักดิ์สิทธิ์', rarity: 'legendary' },
+  { id: 'blacksmith', name: 'ช่างตีเหล็ก', rarity: 'common' }, { id: 'adventurer', name: 'นักผจญภัย', rarity: 'common' },
+  { id: 'sage', name: 'มหาปราชญ์ผมเทา', rarity: 'legendary' }, { id: 'princess', name: 'เจ้าหญิง', rarity: 'epic' },
+  { id: 'farmer', name: 'ชาวนา', rarity: 'common' }, { id: 'guard', name: 'ทหารยาม', rarity: 'common' },
+  { id: 'slime', name: 'สไลม์', rarity: 'common' }, { id: 'goblin', name: 'ก็อบลิน', rarity: 'common' },
+  { id: 'wolf', name: 'หมาป่าเทา', rarity: 'rare' }, { id: 'skeleton', name: 'โครงกระดูกนักรบ', rarity: 'rare' },
 ];
 export const STARTER_SKIN = 'swordsman';
 export const skinById = (id: string) => skins.find(s => s.id === id);

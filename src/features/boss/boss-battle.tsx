@@ -6,7 +6,8 @@ import { bosses, codeLangs, heartsFor, questionView, type CodeLang } from './cat
 import { answer, applyHint, drinkPotion, startBattle, type Battle } from './battle';
 import { trackFor } from './music';
 import { usePref, writePref } from './prefs';
-import { PixelBoss, PixelPlayer, PixelScene, useReducedMotion } from './pixel/pixel-canvas';
+import { PixelScene, useReducedMotion } from './pixel/pixel-canvas';
+import { bossImage } from './boss-avatar';
 import type { Mode } from './pixel/engine';
 import { items, skinById, skinImage, STARTER_SKIN, type ItemId } from '../shop/catalog';
 import { inventory } from '../journey/progress';
@@ -145,8 +146,8 @@ export function BossBattle({ quest }: { quest: Quest }) {
       <div className="hud hud-player"><span className="hud-name"><img className="hud-skin" src={skinImage(skin.id)} alt="" />คุณ · {skin.name}</span><span className="hearts" aria-label={`หัวใจ ${playerHearts}/${heartSlots}`}>{Array.from({ length: heartSlots }, (_, i) => <i key={i} className={i < playerHearts ? '' : 'lost'}>♥</i>)}</span></div>
       <div className="hud hud-boss"><span className="hud-name">{boss.name}</span><span className="hpbar" aria-label={`พลังบอส ${bossHP}/${maxHP}`}>{Array.from({ length: maxHP }, (_, i) => <i key={i} className={i < bossHP ? '' : 'lost'} />)}</span></div>
       {battle && battle.combo >= 2 && !ended && <span className="combo">COMBO ×{battle.combo}</span>}
-      <div className={`arena-player ${fx.playerMove}`}><PixelPlayer color="#285444" trim="#956c23" mode={fx.player} flash={fx.playerFlash} /></div>
-      <div className={`arena-boss ${fx.bossMove}`}><PixelBoss sprite={boss.sprite} mode={bossMode} flash={fx.bossFlash} label={`${boss.name}${passed ? ' · ชนะแล้ว' : ''}`} /></div>
+      <div className={`arena-player ${fx.playerMove}`}><img src={skinImage(skin.id)} alt="" className={`sprite player-sprite ${fx.player} ${fx.playerFlash ? 'flash' : ''}`} /></div>
+      <div className={`arena-boss ${fx.bossMove}`}><img src={bossImage(boss.sprite)} alt={`${boss.name}${passed ? ' · ชนะแล้ว' : ''}`} className={`sprite boss-sprite boss-${boss.sprite} ${bossMode} ${fx.bossFlash ? 'flash' : ''}`} /></div>
       {floats.map(f => <span key={f.id} className={`float float-${f.kind}`} aria-hidden="true">{f.text}</span>)}
       {ended && <div className={`arena-result ${battle.phase}`} role="status">
         <strong>{battle.phase === 'victory' ? 'VICTORY!' : 'DEFEAT'}</strong>

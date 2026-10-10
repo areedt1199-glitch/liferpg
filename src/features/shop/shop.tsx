@@ -66,7 +66,7 @@ export function Shop() {
       <div className="market-keeper" aria-hidden="true">
         <p className="bubble">{say}</p>
         
-        <img src={skinImage('elder')} alt="" className="keeper" />
+        <img src={skinImage('sage')} alt="" className="keeper" />
         <div className="counter" />
       </div>
 

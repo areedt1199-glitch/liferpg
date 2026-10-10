@@ -1,8 +1,9 @@
 "use client";
-import { bosses } from './catalog';
-import { PixelBoss } from './pixel/pixel-canvas';
-/** Small static boss marker for the journey map. */
+/* eslint-disable @next/next/no-img-element -- pixel-art sprites are small static files scaled by CSS */
+import { bosses, type SpriteId } from './catalog';
+export const bossImage = (sprite: SpriteId) => `/images/bosses/${sprite}.png`;
+/** Small boss marker for the journey map. */
 export function BossAvatar({ questId, small = false, defeated = false }: { questId: string; small?: boolean; defeated?: boolean }) {
   const boss = bosses[questId]; if (!boss) return null;
-  return <PixelBoss sprite={boss.sprite} mode={defeated ? 'ko' : 'idle'} animate={false} className={`boss-avatar ${small ? 'small' : ''} ${defeated ? 'defeated' : ''}`} label={`${boss.name}${defeated ? ' · ชนะแล้ว' : ''}`} />;
+  return <img src={bossImage(boss.sprite)} alt={`${boss.name}${defeated ? ' · ชนะแล้ว' : ''}`} className={`boss-avatar ${small ? 'small' : ''} ${defeated ? 'defeated' : ''}`} />;
 }

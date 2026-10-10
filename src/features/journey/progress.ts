@@ -129,6 +129,11 @@ export function parseProgress(raw: string | null): UserProgress {
       expected.careerId=value.careerId;
     }
     if(!value.skins||typeof value.skins!=='object'||Array.isArray(value.skins)||!Array.isArray(value.itemPurchases)||!Array.isArray(value.itemUses))throw new Error('ข้อมูลร้านค้าไม่รองรับ');
+    // Skins retired when the roster changed are refunded; wearing a retired one falls back to the starter.
+    const kept:Record<string,SkinPurchase>={};
+    for(const [id,p] of Object.entries(value.skins)){if(skinById(id))kept[id]=p;else if(Number.isSafeInteger(p?.coins))value.coins+=p.coins;}
+    value.skins=kept;
+    if(!skinById(value.equippedSkinId))value.equippedSkinId=STARTER_SKIN;
     for(const [id,p] of Object.entries(value.skins)){
       const skin=skinById(id);
       if(!skin||skinPrice(skin)===0||p?.skinId!==id||p.coins!==skinPrice(skin)||!Number.isSafeInteger(p.purchasedAt)||p.purchasedAt<0)throw new Error('ข้อมูลสกินไม่สอดคล้องกัน');
