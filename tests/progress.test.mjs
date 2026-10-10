@@ -476,3 +476,26 @@ test('language variants keep the same answer index as the shared answer key',()=
  assert.equal(Object.values(bossRules.bosses).map(b=>b.questions.length).join(),'3,4,5,6,7,8,9,10');
 });
 const sameJSON=(a,b)=>assert.equal(JSON.stringify(a),JSON.stringify(b));
+
+test('turn-based battle: wrong answers cost hearts and requeue; victory yields a full correct answer set',()=>{
+ const battleRules=loadRules('src/features/boss/battle.ts',{'./catalog':bossRules});
+ const boss=bossRules.bosses.loops,n=boss.questions.length;let seed=1;const rand=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+ let b=battleRules.startBattle(boss,rand);assert.equal(b.bossHP,n);assert.equal(b.hearts,bossRules.heartsFor(boss));assert.equal(b.order.length,boss.questions[b.current].options.length);
+ const wrongOf=q=>(q.answer+1)%q.options.length;
+ const first=b.current;let t=battleRules.answer(b,boss,wrongOf(boss.questions[first]),rand);
+ assert.equal(t.correct,false);assert.equal(t.battle.hearts,b.hearts-1);assert.equal(t.battle.queue.at(-1),first);assert.equal(t.battle.combo,0);
+ b=t.battle;
+ while(b.phase==='player'){const q=boss.questions[b.current];t=battleRules.answer(b,boss,q.answer,rand);if(b.current===first)assert.equal(t.crit,false,'missed question is not a critical');b=t.battle;}
+ assert.equal(b.phase,'victory');assert.equal(b.bossHP,0);
+ assert.equal(JSON.stringify(Object.keys(b.answers).sort()),JSON.stringify(boss.questions.map(q=>q.id).sort()));
+ for(const q of boss.questions)assert.equal(b.answers[q.id],q.answer);
+ assert.ok(bossRules.gradeBoss('loops',b.answers)===n);
+ assert.throws(()=>battleRules.answer(b,boss,0,rand));
+ // Running out of hearts ends the fight.
+ let d=battleRules.startBattle(boss,rand);while(d.phase==='player')d=battleRules.answer(d,boss,wrongOf(boss.questions[d.current]),rand).battle;
+ assert.equal(d.phase,'defeat');assert.equal(d.hearts,0);
+ // The hint removes exactly one wrong option, once per battle.
+ const h=battleRules.applyHint(battleRules.startBattle(boss,rand),boss,rand);const hq=boss.questions[h.current];
+ assert.equal(h.hint,0);assert.notEqual(h.removed,hq.answer);assert.ok(h.removed>=0&&h.removed<hq.options.length);
+ assert.equal(battleRules.applyHint(h,boss,rand),h);
+});

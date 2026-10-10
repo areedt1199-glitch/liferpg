@@ -23,7 +23,7 @@ npm run dev -- --hostname 127.0.0.1 --port 3010
 
 Checklist ใช้ step ID คงที่ เช็กครบหรือ timer ครบไม่ผ่านอัตโนมัติ Timer เริ่ม/พัก/ทำต่อ/จบรอบ/เริ่มใหม่ ใช้ timestamp และ elapsed ที่บันทึก ไม่เขียนทุกวินาที Running เดินต่อเมื่อออกหน้า; paused ไม่เดิน บัญชีใช้เวลา server สำหรับ lifecycle และปรับเวลาแสดงผลจาก snapshot เวลาเป็นบันทึกที่ผู้ใช้รายงาน ไม่ใช่หลักฐานผลงาน
 
-รางวัลเดิมจาก definitions: XP 120/80/90/100/120, เหรียญ 35/20/25/30/40 รวม 510/150 เลเวล `1 + floor(totalXP / 100)` ไม่มีโบนัสจบเป้าหมาย บัญชีคำนวณยอดจาก reward ledger แหล่งเดียว ไม่มีคอลัมน์ยอดที่ผู้ใช้แก้ได้
+รางวัลจาก definitions (8 ด่าน): XP 120/80/90/100/120/130/140/150, เหรียญ 35/20/25/30/40/45/50/60 รวม 930/305 เลเวล `1 + floor(totalXP / 100)` ไม่มีโบนัสจบเป้าหมาย บัญชีคำนวณยอดจาก reward ledger แหล่งเดียว ไม่มีคอลัมน์ยอดที่ผู้ใช้แก้ได้
 
 ## ไฟล์หลัก
 - `src/lib/supabase/`: config, browser/server clients; `src/proxy.ts`: session refresh และ private no-store
@@ -63,3 +63,12 @@ Default test ใช้ Node runner และ PGlite ทดสอบ SQL จร�
 แชทฟรีค้นคลังบทเรียนในเครื่องตาม LifeQuest ไม่ใช่ generative AI มี API Gemini เตรียมไว้แต่ปิดค่าเริ่มต้น: ตั้ง GEMINI_ENABLED=true, GEMINI_API_KEY และ GEMINI_MODEL ใน .env.local เฉพาะ server ต้องเข้าสู่บัญชีและยินยอมส่งคำถามพร้อมเนื้อหาบทเรียนไป Google มี quota 20 requests/วัน และเว้น 2 วินาที รวมคำขอที่ provider ล้มเหลว ยังไม่ทดสอบ Gemini จริง และ quota ไม่รับประกันว่าผู้ให้บริการไม่มีค่าใช้จ่าย
 Migration 20261009093333_lifequest_growth.sql ใช้กับ Supabase โปรเจกต์เดิมแล้ว ไม่คัดลอก Firebase configuration หรือข้อมูลผู้ใช้จาก LifeQuest ไม่เพิ่ม dependency ไม่ push/deploy
 
+
+## ระบบสู้บอส Turn-Based (11 ตุลาคม 2026)
+- เป้าหมาย "สร้างเกมแรก" ขยายเป็น 8 ด่าน (เพิ่ม ฟังก์ชัน / ลิสต์และคะแนนสูงสุด / เผยแพร่เกม) บอสด่าน N มี N+2 คำถาม รวม 52 ข้อ ทุกข้อมีคำอธิบายและลิงก์แหล่งอ้างอิง (Python docs, MDN, Pro Git ฯลฯ) ข้อที่มีโค้ดเลือกดูเป็น Python หรือ JavaScript ได้ ตำแหน่งเฉลยตรงกันทั้งสองภาษา
+- `src/features/boss/catalog.ts` เป็นแหล่งข้อมูลเดียวของคำถามและเฉลย เขียนตัวเลือกถูกไว้แรกเสมอ แล้วสลับลำดับแบบคงที่ตาม id; `scripts/generate-boss-v2-migration.mjs` สร้าง migration จากไฟล์นี้
+- กติกา: ตอบถูก = โจมตีบอส, ตอบผิด = เสียหัวใจและข้อนั้นวนกลับมา, คำใบ้ 1 ครั้ง, หัวใจ 3–5 ดวงตามด่าน ชนะแล้วจึงส่งคำตอบให้ server ตรวจ (`boss_attempt`) แบบเดิม ผลบอสเก็บ `total` แล้ว ผลชนะ 3/3 เดิมยังใช้ได้
+- ภาพบอส ตัวละคร และฉาก 16-bit วาดด้วยโค้ดทั้งหมดใน `src/features/boss/pixel/`
+- เพลงต่อสู้ 8 เพลงจาก OpenGameArt (CC0 / CC-BY 3.0) แปลงเป็น MP3 112 kbps ใน `public/audio/battle/` เครดิตอยู่ที่ `/credits` และ `src/features/boss/music.ts`
+- ข้อมูล demo/snapshot แบบ 5 ด่านย้ายอัตโนมัติ ผู้ที่จบ 5 ด่านแล้วไปต่อด่าน 6 ได้ทันที
+- Migration ใหม่ `20261010120000_daily_practice.sql` และ `20261011120000_eight_levels.sql` ทดสอบกับ PGlite แล้ว ยังไม่ได้ apply กับ Supabase จริง

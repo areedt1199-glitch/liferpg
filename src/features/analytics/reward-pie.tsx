@@ -1,7 +1,7 @@
 import {journeyDefinition} from '../journey/definitions';
 import type {UserProgress} from '../journey/progress';
 import {bangkokDay,type ChartMetric} from './rules';
-const colors=['#315a45','#c89c4c','#9888b4','#709bb0','#b87d6a'];
+const colors=['#315a45','#c89c4c','#9888b4','#709bb0','#b87d6a','#5f8f6e','#7a5aa0','#d9a441'];
 export function RewardPie({progress,metric,dates}:{progress:UserProgress;metric:ChartMetric;dates:string[]}){
  const slices=journeyDefinition.quests.map((q,i)=>{const r=progress.rewards[q.id];return {title:q.title,color:colors[i],value:r&&dates.includes(bangkokDay(r.completedAt))?metric==='quests'?1:r[metric]:0};});
  if(metric!=='quests')slices.push({title:'ฝึกประจำวัน',color:'#8a6f4e',value:Object.values(progress.practice??{}).filter(r=>dates.includes(r.day)).reduce((n,r)=>n+r[metric],0)});

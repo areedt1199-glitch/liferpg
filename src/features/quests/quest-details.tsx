@@ -24,7 +24,7 @@ export function QuestDetails({ quest, compact = false }: { quest: Quest; compact
     {!compact && <><h3>ทำทีละขั้น</h3><ol className="steps">{quest.steps.map(step => <li key={step.id}>{step.text}</li>)}</ol></>}
     <div className="success-box"><Icon name="check" /><div><h3>เงื่อนไขสำเร็จ</h3><p>{quest.success}</p></div></div>
     <QuestAction questId={quest.id} compact={compact} />
-    {!compact&&<p className="muted">บอสประจำด่าน · {bosses[quest.id].name} {progress.bosses[quest.id]?.passedAt!=null?'✓ ชนะแล้ว':status==='completed'?'· ผ่านเควสต์ก่อนเพิ่มระบบบอส':'· แบบทดสอบ 3 ข้อในหน้าโฟกัส'}</p>}
+    {!compact&&<p className="muted">บอสประจำด่าน · {bosses[quest.id].name} {progress.bosses[quest.id]?.passedAt!=null?'✓ ชนะแล้ว':status==='completed'?'· ผ่านเควสต์ก่อนเพิ่มระบบบอส':`· ต่อสู้แบบตอบคำถาม ${bosses[quest.id].questions.length} ข้อในหน้าโฟกัส`}</p>}
     {!compact&&<EvidencePanel questId={quest.id}/>}
     {!compact && <Link className="text-link" href={`/goals/${journeyDefinition.id}`}>← กลับแผนที่</Link>}
   </section>;

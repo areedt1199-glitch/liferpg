@@ -48,8 +48,7 @@ export function FocusQuest({ quest }: { quest: Quest }) {
     </section><section className="focus-task"><p className="eyebrow">งานตรงหน้า</p><h2>{quest.task}</h2><p className="checklist-count">ทำแล้ว {focus.checkedStepIds.length}/{quest.steps.length} ขั้นตอน</p>
       <ul className="focus-checklist">{quest.steps.map(step => <li key={step.id}><label><input type="checkbox" checked={focus.checkedStepIds.includes(step.id)} onChange={event => { void setStepChecked(quest.id, step.id, event.target.checked); }} /><span>{step.text}</span></label></li>)}</ul>
       <div className="success-box"><div><h3>เงื่อนไขสำเร็จ</h3><p>{quest.success}</p></div></div><p className="focus-note">เช็กครบหรือเวลาครบไม่ทำให้ผ่านเควสต์อัตโนมัติ<br />เวลานี้เป็นบันทึกการโฟกัสที่คุณรายงาน ไม่ใช่หลักฐานว่างานสำเร็จ</p>
-      <BossBattle quest={quest}/><EvidencePanel questId={quest.id}/>
-      <CompletionConfirmation quest={quest} onSaved={() => setFreshQuestId(quest.id)} />
     </section></div>
+    <div className="focus-after"><BossBattle quest={quest}/><EvidencePanel questId={quest.id}/><CompletionConfirmation quest={quest} onSaved={() => setFreshQuestId(quest.id)} /></div>
   </>;
 }
