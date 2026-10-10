@@ -1,0 +1,380 @@
+[
+  {
+    "id": "game_developer",
+    "category": "career",
+    "title": "นักพัฒนาเกม",
+    "englishTitle": "Game Developer",
+    "description": "เรียนรู้การเขียนโปรแกรม เอนจินเกม และสร้างเกมของตัวเอง",
+    "tasks": [
+      {
+        "id": "learn_cpp",
+        "title": "เรียนรู้ C++",
+        "description": "เรียนแนวคิดและฝึกเขียนโปรแกรมด้วยภาษา C++"
+      },
+      {
+        "id": "practice_unreal",
+        "title": "ฝึกใช้ Unreal Engine",
+        "description": "ทดลองเครื่องมือและสร้างระบบขนาดเล็กใน Unreal Engine"
+      },
+      {
+        "id": "practice_3d_modeling",
+        "title": "ฝึกสร้างโมเดล 3 มิติ",
+        "description": "ฝึกปั้นหรือสร้างวัตถุ 3 มิติสำหรับใช้ในเกม"
+      },
+      {
+        "id": "programming_challenge",
+        "title": "โจทย์ท้าทายการเขียนโปรแกรม",
+        "description": "แก้โจทย์เขียนโปรแกรมเพื่อฝึกคิดเป็นระบบ"
+      },
+      {
+        "id": "mini_game_project",
+        "title": "โปรเจกต์มินิเกม",
+        "description": "สร้างมินิเกมหนึ่งส่วนให้เล่นหรือทดสอบได้จริง"
+      }
+    ]
+  },
+  {
+    "id": "software_developer",
+    "category": "career",
+    "title": "นักพัฒนาซอฟต์แวร์",
+    "englishTitle": "Software Developer",
+    "description": "ฝึกเขียนโปรแกรม อัลกอริทึม Git และสร้างแอปพลิเคชัน",
+    "tasks": [
+      {
+        "id": "study_programming",
+        "title": "ศึกษาการเขียนโปรแกรม",
+        "description": "เรียนแนวคิดการเขียนโปรแกรมและทดลองเขียนโค้ด"
+      },
+      {
+        "id": "practice_algorithms",
+        "title": "ฝึกอัลกอริทึม",
+        "description": "ฝึกแก้ปัญหาด้วยโครงสร้างข้อมูลและอัลกอริทึม"
+      },
+      {
+        "id": "practice_git",
+        "title": "ฝึกใช้ Git และ GitHub",
+        "description": "ฝึก commit, branch และจัดการโค้ดบน GitHub"
+      },
+      {
+        "id": "coding_challenge",
+        "title": "โจทย์ท้าทายการเขียนโค้ด",
+        "description": "แก้โจทย์เขียนโค้ดด้วยตัวเองให้สำเร็จ"
+      },
+      {
+        "id": "build_mini_app",
+        "title": "สร้างมินิแอป",
+        "description": "สร้างแอปขนาดเล็กที่เปิดใช้งานและทดลองได้"
+      }
+    ]
+  },
+  {
+    "id": "ui_ux_designer",
+    "category": "career",
+    "title": "นักออกแบบ UI/UX",
+    "englishTitle": "UI/UX Designer",
+    "description": "ฝึกออกแบบหน้าจอ วิเคราะห์ประสบการณ์ และสร้างผลงาน",
+    "tasks": [
+      {
+        "id": "practice_figma",
+        "title": "ฝึกใช้ Figma",
+        "description": "ฝึกใช้เครื่องมือและคอมโพเนนต์ใน Figma"
+      },
+      {
+        "id": "study_ui_ux",
+        "title": "ศึกษาหลักการ UI/UX",
+        "description": "เรียนหลักการออกแบบที่ใช้งานง่ายและเหมาะกับผู้ใช้"
+      },
+      {
+        "id": "design_one_screen",
+        "title": "ออกแบบหนึ่งหน้าจอ",
+        "description": "ออกแบบหน้าจอให้ครบทั้งโครงสร้างและรูปแบบภาพ"
+      },
+      {
+        "id": "analyze_app_ui",
+        "title": "วิเคราะห์ UI ของแอปอื่น",
+        "description": "สังเกตจุดเด่น ปัญหา และเหตุผลในการออกแบบ"
+      },
+      {
+        "id": "mini_design_project",
+        "title": "มินิโปรเจกต์ออกแบบ",
+        "description": "สร้างผลงานออกแบบขนาดเล็กตั้งแต่แนวคิดถึงต้นแบบ"
+      }
+    ]
+  },
+  {
+    "id": "english",
+    "category": "skill",
+    "title": "ภาษาอังกฤษ",
+    "englishTitle": "English",
+    "description": "พัฒนาคำศัพท์ การฟัง พูด อ่าน และสนทนาในชีวิตจริง",
+    "tasks": [
+      {
+        "id": "vocabulary_practice",
+        "title": "ฝึกคำศัพท์ภาษาอังกฤษ",
+        "description": "เรียนและทบทวนคำศัพท์พร้อมนำไปใช้ในประโยค"
+      },
+      {
+        "id": "english_listening",
+        "title": "ฝึกฟังภาษาอังกฤษ",
+        "description": "ฟังเนื้อหาภาษาอังกฤษและจับใจความสำคัญ"
+      },
+      {
+        "id": "english_speaking",
+        "title": "ฝึกพูดภาษาอังกฤษ",
+        "description": "พูดภาษาอังกฤษตามหัวข้อที่กำหนดโดยไม่อ่านสคริปต์"
+      },
+      {
+        "id": "english_reading",
+        "title": "ฝึกอ่านภาษาอังกฤษ",
+        "description": "อ่านบทความหรือเรื่องสั้นและสรุปใจความ"
+      },
+      {
+        "id": "real_conversation",
+        "title": "สนทนาภาษาอังกฤษจริง",
+        "description": "สนทนากับอีกคนโดยใช้ภาษาอังกฤษให้มากที่สุด"
+      }
+    ]
+  },
+  {
+    "id": "programming",
+    "category": "skill",
+    "title": "การเขียนโปรแกรม",
+    "englishTitle": "Programming",
+    "description": "ฝึกเขียนโค้ด อ่านเอกสาร และสร้างโปรเจกต์ด้วยตัวเอง",
+    "tasks": [
+      {
+        "id": "study_programming",
+        "title": "ศึกษาการเขียนโปรแกรม",
+        "description": "เรียนแนวคิดใหม่และทดลองเขียนโค้ดตามความเข้าใจ"
+      },
+      {
+        "id": "coding_problems",
+        "title": "แก้โจทย์เขียนโค้ด",
+        "description": "ฝึกแก้โจทย์และอธิบายวิธีคิดของตัวเอง"
+      },
+      {
+        "id": "read_documentation",
+        "title": "อ่านเอกสารประกอบ",
+        "description": "อ่านเอกสารทางการและทดลองใช้สิ่งที่เรียนรู้"
+      },
+      {
+        "id": "build_without_copying",
+        "title": "สร้างบางสิ่งโดยไม่คัดลอก",
+        "description": "สร้างฟีเจอร์หรือโปรแกรมด้วยความเข้าใจของตัวเอง"
+      },
+      {
+        "id": "mini_project",
+        "title": "มินิโปรเจกต์",
+        "description": "สร้างโปรเจกต์ขนาดเล็กที่ใช้งานหรือสาธิตได้"
+      }
+    ]
+  },
+  {
+    "id": "3d_modeling",
+    "category": "skill",
+    "title": "การสร้างโมเดล 3 มิติ",
+    "englishTitle": "3D Modeling",
+    "description": "เรียน Blender การขึ้นรูป วัสดุ และสร้างโมเดลให้เสร็จ",
+    "tasks": [
+      {
+        "id": "learn_blender_tools",
+        "title": "เรียนรู้เครื่องมือ Blender",
+        "description": "ฝึกใช้เครื่องมือสำคัญสำหรับสร้างโมเดล"
+      },
+      {
+        "id": "model_an_object",
+        "title": "สร้างโมเดลวัตถุหนึ่งชิ้น",
+        "description": "เลือกวัตถุและสร้างรูปทรงให้ใกล้เคียงต้นแบบ"
+      },
+      {
+        "id": "practice_materials",
+        "title": "ฝึกวัสดุและพื้นผิว",
+        "description": "ทดลอง Material และ Texture กับโมเดลของคุณ"
+      },
+      {
+        "id": "complete_3d_model",
+        "title": "สร้างโมเดล 3 มิติให้เสร็จหนึ่งชิ้น",
+        "description": "สร้างโมเดลพร้อมวัสดุและนำเสนอผลงานให้เรียบร้อย"
+      }
+    ]
+  },
+  {
+    "id": "public_speaking",
+    "category": "skill",
+    "title": "การพูดในที่สาธารณะ",
+    "englishTitle": "Public Speaking",
+    "description": "ฝึกพูด บันทึกตัวเอง และนำเสนอต่อผู้อื่นอย่างมั่นใจ",
+    "tasks": [
+      {
+        "id": "mirror_speaking",
+        "title": "พูดหน้ากระจก",
+        "description": "ฝึกท่าทาง น้ำเสียง และการสบตากับตัวเอง"
+      },
+      {
+        "id": "random_topic",
+        "title": "พูดจากหัวข้อสุ่ม",
+        "description": "สุ่มหัวข้อแล้วพูดโดยเตรียมตัวให้น้อยที่สุด"
+      },
+      {
+        "id": "record_speaking",
+        "title": "บันทึกวิดีโอหรือเสียงขณะพูด",
+        "description": "บันทึกตัวเองแล้วทบทวนจุดที่ควรปรับปรุง"
+      },
+      {
+        "id": "present_to_person",
+        "title": "นำเสนอต่ออีกคนหนึ่ง",
+        "description": "นำเสนอหัวข้อที่เลือกและขอความคิดเห็นหลังจบ"
+      }
+    ]
+  },
+  {
+    "id": "fitness",
+    "category": "skill",
+    "title": "ฟิตเนส",
+    "englishTitle": "Fitness",
+    "description": "สร้างความแข็งแรง ความยืดหยุ่น และวินัยในการออกกำลังกาย",
+    "tasks": [
+      {
+        "id": "walk_or_run",
+        "title": "เดินหรือวิ่ง",
+        "description": "เดินหรือวิ่งในระดับที่เหมาะกับร่างกายของคุณ"
+      },
+      {
+        "id": "strength_training",
+        "title": "ฝึกความแข็งแรง",
+        "description": "ฝึกกล้ามเนื้อด้วยโปรแกรมที่เหมาะกับระดับของคุณ"
+      },
+      {
+        "id": "stretching",
+        "title": "ยืดเหยียดร่างกาย",
+        "description": "ยืดเหยียดอย่างปลอดภัยเพื่อเพิ่มความยืดหยุ่น"
+      },
+      {
+        "id": "weekly_workout_challenge",
+        "title": "ความท้าทายออกกำลังกายประจำสัปดาห์",
+        "description": "ทำโปรแกรมออกกำลังกายที่ท้าทายกว่าวันปกติ"
+      }
+    ]
+  },
+  {
+    "id": "healthy_lifestyle",
+    "category": "life",
+    "title": "ลดน้ำหนักและสร้างสุขภาพที่ดี",
+    "englishTitle": "Lose Weight / Healthy Lifestyle",
+    "description": "สร้างกิจวัตรออกกำลังกายและการกินที่ทำได้อย่างต่อเนื่อง",
+    "tasks": [
+      {
+        "id": "walk_run_30",
+        "title": "เดินหรือวิ่ง 30 นาที",
+        "description": "ออกกำลังกายแบบคาร์ดิโอในระดับที่เหมาะกับคุณ"
+      },
+      {
+        "id": "strength_training",
+        "title": "ฝึกความแข็งแรง",
+        "description": "ทำโปรแกรมฝึกกล้ามเนื้อตามแผนของคุณ"
+      },
+      {
+        "id": "healthy_food_day",
+        "title": "เลือกอาหารเพื่อสุขภาพตามแผนทั้งวัน",
+        "description": "ทำตามแผนอาหารที่สมดุลและเหมาะกับเป้าหมายของคุณ"
+      },
+      {
+        "id": "weekly_planned_routine",
+        "title": "ทำกิจวัตรตามแผนครบหนึ่งสัปดาห์",
+        "description": "รักษาแผนออกกำลังกายและอาหารให้ครบตามที่ตั้งไว้"
+      }
+    ]
+  },
+  {
+    "id": "save_money",
+    "category": "life",
+    "title": "เก็บออมเงิน",
+    "englishTitle": "Save Money",
+    "description": "บันทึกค่าใช้จ่าย ลดรายจ่าย และทำเป้าหมายเงินออมให้สำเร็จ",
+    "tasks": [
+      {
+        "id": "record_finances",
+        "title": "บันทึกรายรับและรายจ่าย",
+        "description": "บันทึกธุรกรรมของวันนี้ให้ครบและตรวจยอดรวม"
+      },
+      {
+        "id": "avoid_unnecessary_purchase",
+        "title": "งดซื้อสิ่งที่ไม่จำเป็น",
+        "description": "หยุดคิดก่อนซื้อและเก็บเงินก้อนนั้นไว้แทน"
+      },
+      {
+        "id": "weekly_savings_goal",
+        "title": "ทำเป้าหมายเงินออมประจำสัปดาห์",
+        "description": "ออมเงินให้ได้ตามจำนวนที่วางแผนไว้ในสัปดาห์นี้"
+      },
+      {
+        "id": "monthly_savings_goal",
+        "title": "ทำเป้าหมายเงินออมประจำเดือน",
+        "description": "ออมเงินให้ได้ตามเป้าหมายของเดือนนี้"
+      }
+    ]
+  },
+  {
+    "id": "read_more",
+    "category": "life",
+    "title": "อ่านหนังสือมากขึ้น",
+    "englishTitle": "Read More",
+    "description": "สร้างนิสัยอ่านหนังสือ สรุปความรู้ และอ่านให้จบเล่ม",
+    "tasks": [
+      {
+        "id": "read_20_minutes",
+        "title": "อ่านหนังสือ 20 นาที",
+        "description": "อ่านอย่างตั้งใจโดยลดสิ่งรบกวนรอบตัว"
+      },
+      {
+        "id": "read_30_pages",
+        "title": "อ่านหนังสือ 30 หน้า",
+        "description": "อ่านหนังสือที่เลือกให้ครบ 30 หน้า"
+      },
+      {
+        "id": "write_summary",
+        "title": "เขียนสรุปสั้น ๆ",
+        "description": "สรุปแนวคิดสำคัญจากสิ่งที่อ่านด้วยคำของตัวเอง"
+      },
+      {
+        "id": "finish_book",
+        "title": "อ่านหนังสือจบหนึ่งเล่ม",
+        "description": "อ่านหนังสือที่เลือกจนจบและบันทึกสิ่งที่ได้เรียนรู้"
+      }
+    ]
+  },
+  {
+    "id": "travel_goal",
+    "category": "life",
+    "title": "เป้าหมายการท่องเที่ยว",
+    "englishTitle": "Travel Goal",
+    "description": "วางแผนงบประมาณ เส้นทาง และเก็บเงินเพื่อเดินทางจริง",
+    "tasks": [
+      {
+        "id": "research_destination",
+        "title": "ค้นคว้าจุดหมายปลายทาง",
+        "description": "ศึกษาสถานที่ ช่วงเวลา และข้อมูลสำคัญของจุดหมาย"
+      },
+      {
+        "id": "create_trip_budget",
+        "title": "จัดทำงบประมาณการเดินทาง",
+        "description": "ประมาณค่าเดินทาง ที่พัก อาหาร และเงินสำรอง"
+      },
+      {
+        "id": "create_itinerary",
+        "title": "จัดทำแผนการเดินทาง",
+        "description": "กำหนดวัน เวลา สถานที่ และการเดินทางแต่ละช่วง"
+      },
+      {
+        "id": "save_for_trip",
+        "title": "เก็บเงินสำหรับการเดินทาง",
+        "description": "ออมเงินเข้ากองทุนท่องเที่ยวตามเป้าหมาย"
+      },
+      {
+        "id": "complete_trip",
+        "title": "ออกเดินทางจริง",
+        "description": "ทำทริปที่วางแผนไว้ให้สำเร็จอย่างปลอดภัย"
+      }
+    ]
+  }
+]

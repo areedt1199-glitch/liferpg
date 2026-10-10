@@ -1,0 +1,22 @@
+-- Generated from definitions.ts; reviewed, immutable content for this migration.
+insert into public.journey_definitions(id,title,description) values ('first-game','สร้างเกมแรก','จากบรรทัดแรก สู่เกมเล็ก ๆ ที่คุณสร้างเอง') on conflict (id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('tools','first-game','1','เตรียมเครื่องมือ','ติดตั้งเครื่องมือและรัน Hello World','หมู่บ้านเริ่มต้น','ติดตั้งเครื่องมือสำเร็จและแสดงข้อความ Hello World ได้','20','120','35') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('tools','install-tools','1','ติดตั้งเครื่องมือเขียนโปรแกรม') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('tools','create-file','2','สร้างไฟล์โปรแกรมแรก') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('tools','hello-world','3','รัน Hello World') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('variables','first-game','2','ตัวแปรและเงื่อนไข','เขียนโปรแกรมรับค่าและใช้ if/else','ป่าของการเรียนรู้','โปรแกรมรันได้และทดลองทั้งกรณีผ่านกับไม่ผ่าน','25','80','20') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('variables','read-conditions','1','อ่านตัวอย่างตัวแปรและ if/else') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('variables','receive-score','2','เขียนโปรแกรมรับคะแนน') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('variables','show-result','3','แสดงผลผ่าน/ไม่ผ่านด้วยเงื่อนไข') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('loops','first-game','3','ฝึกลูป','เขียนโปรแกรมทำงานซ้ำ','ค่ายฝึก','โปรแกรมทำงานซ้ำได้ตามจำนวนรอบที่กำหนด','25','90','25') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('loops','read-loops','1','อ่านตัวอย่างลูป') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('loops','repeat-count','2','เขียนโปรแกรมนับเลขซ้ำ') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('loops','change-rounds','3','ทดลองเปลี่ยนจำนวนรอบ') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('guess-number','first-game','4','เกมทายตัวเลข','รวมเงื่อนไขและลูปเป็นเกมเล็ก','ดันเจี้ยนตัวเลข','เกมรับค่าทายซ้ำและแสดงผลเมื่อตอบถูกได้','30','100','30') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('guess-number','set-answer','1','กำหนดตัวเลขคำตอบ') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('guess-number','read-guess','2','รับค่าทายและตรวจด้วยเงื่อนไข') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('guess-number','repeat-guesses','3','ให้ทายซ้ำจนตอบถูก') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('improve-game','first-game','5','ทดลองและปรับเกม','ทดสอบ แก้ข้อผิดพลาด และสรุปผลงาน','ยอดเขาจุดหมาย','เกมผ่านกรณีทดสอบที่เตรียมไว้และมีสรุปผลงาน','30','120','40') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','test-cases','1','ทดลองเล่นหลายกรณี') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','fix-errors','2','แก้ข้อผิดพลาดที่พบ') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','summarize','3','สรุปสิ่งที่เรียนรู้') on conflict (quest_id,id) do nothing;

@@ -1,0 +1,78 @@
+create table public.boss_questions(id text primary key,quest_id text not null references public.quest_definitions(id),position integer not null,prompt text not null,options jsonb not null,unique(quest_id,position));
+create index boss_questions_quest_idx on public.boss_questions(quest_id);
+create table private.boss_answers(question_id text primary key references public.boss_questions(id),answer integer not null check(answer between 0 and 2));
+insert into public.boss_questions values
+-- QUESTION_ROWS
+;
+insert into private.boss_answers values
+-- ANSWER_ROWS
+;
+create table public.boss_results(user_id uuid not null references public.user_progress(user_id),quest_id text not null references public.quest_definitions(id),score integer not null check(score between 0 and 3),attempts integer not null check(attempts>0),passed_at timestamptz,primary key(user_id,quest_id),check((score=3)=(passed_at is not null)));
+create index boss_results_quest_idx on public.boss_results(quest_id);
+create table public.quest_evidence(id uuid primary key,user_id uuid not null references public.user_progress(user_id),quest_id text not null references public.quest_definitions(id),path text not null unique,mime text not null check(mime in ('image/jpeg','image/png','image/webp')),size integer not null check(size between 1 and 5242880),created_at timestamptz not null default clock_timestamp(),unique(user_id,quest_id));
+create index quest_evidence_quest_idx on public.quest_evidence(quest_id);
+alter table public.boss_questions enable row level security;
+alter table public.boss_results enable row level security;
+alter table public.quest_evidence enable row level security;
+revoke all on public.boss_questions,public.boss_results,public.quest_evidence from public,anon,authenticated;
+revoke all on private.boss_answers from public,anon,authenticated;
+grant select on public.boss_questions,public.boss_results,public.quest_evidence to authenticated;
+create policy boss_questions_read on public.boss_questions for select to authenticated using(true);
+create policy boss_results_read on public.boss_results for select to authenticated using((select auth.uid())=user_id);
+create policy quest_evidence_read on public.quest_evidence for select to authenticated using((select auth.uid())=user_id);
+
+alter function private.snapshot() rename to snapshot_growth;
+revoke all on function private.snapshot_growth() from public,anon,authenticated;
+create function private.snapshot() returns jsonb language plpgsql security definer set search_path='' as $$
+declare result jsonb;u uuid;bosses jsonb;photos jsonb;
+begin
+ result:=private.snapshot_growth();u:=auth.uid();
+ select coalesce(jsonb_object_agg(quest_id,jsonb_build_object('score',score,'attempts',attempts,'passedAt',case when passed_at is null then null else floor(extract(epoch from passed_at)*1000)::bigint end)),'{}'::jsonb)into bosses from public.boss_results where user_id=u;
+ select coalesce(jsonb_object_agg(quest_id,jsonb_build_object('id',id,'questId',quest_id,'path',path,'mime',mime,'size',size,'createdAt',floor(extract(epoch from created_at)*1000)::bigint)),'{}'::jsonb)into photos from public.quest_evidence where user_id=u;
+ return jsonb_set(result,'{progress}',(result->'progress')||jsonb_build_object('version',5,'bosses',bosses,'evidence',photos));
+end $$;
+revoke all on function private.snapshot() from public,anon,authenticated;
+grant execute on function private.snapshot() to authenticated;
+create or replace function public.liferpg_snapshot() returns jsonb language sql security invoker set search_path='' as $$select private.snapshot();$$;
+
+-- Revoke the former helper so calling it directly cannot bypass the new gate.
+alter function private.command(text,jsonb) rename to command_core;
+revoke all on function private.command_core(text,jsonb) from public,anon,authenticated;
+create function private.command(action text,payload jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
+declare u uuid;q text:=payload->>'questId';p public.user_progress;s text;score integer;answers jsonb:=payload->'answers';
+begin
+ if action not in ('complete','boss_attempt','evidence_add','evidence_remove')then return private.command_core(action,payload);end if;
+ u:=private.ensure_user();select * into p from public.user_progress where user_id=u;
+ select status into s from public.quest_progress where user_id=u and quest_id=q;
+ if action='complete' and s='completed'then return private.snapshot();end if;
+ if action in ('evidence_add','evidence_remove') then
+  if s is null or s not in ('in_progress','completed')then raise exception 'QUEST_UNAVAILABLE';end if;
+  if action='evidence_remove'then delete from public.quest_evidence where user_id=u and quest_id=q;
+  else
+   if payload->>'path'<>u::text||'/'||q||'/'||(payload->>'id')||'.jpg' then raise exception 'EVIDENCE_PATH_INVALID';end if;
+   if not exists(select 1 from storage.objects where bucket_id='quest-evidence' and name=payload->>'path')then raise exception 'EVIDENCE_FILE_MISSING';end if;
+   insert into public.quest_evidence(id,user_id,quest_id,path,mime,size)values((payload->>'id')::uuid,u,q,payload->>'path',payload->>'mime',(payload->>'size')::integer)on conflict(user_id,quest_id)do update set id=excluded.id,path=excluded.path,mime=excluded.mime,size=excluded.size,created_at=clock_timestamp();
+  end if;
+ else
+  if s<>'in_progress' or p.active_quest_id is distinct from q then raise exception 'QUEST_NOT_ACTIVE';end if;
+  if exists(select 1 from public.quest_steps t where t.quest_id=q and not exists(select 1 from public.checklist c where c.user_id=u and c.quest_id=q and c.step_id=t.id))then raise exception 'CHECKLIST_INCOMPLETE';end if;
+  if action='complete'then
+   if not exists(select 1 from public.boss_results where user_id=u and quest_id=q and passed_at is not null)then raise exception 'BOSS_REQUIRED';end if;
+   return private.command_core(action,payload);
+  end if;
+  if exists(select 1 from public.boss_results where user_id=u and quest_id=q and passed_at is not null)then return private.snapshot();end if;
+  if jsonb_typeof(answers) is distinct from 'object' then raise exception 'BOSS_ANSWERS_INVALID';end if;
+  if (select count(*)from jsonb_object_keys(answers))<>3 or (select count(*)from public.boss_questions where quest_id=q)<>3 or exists(select 1 from public.boss_questions b where b.quest_id=q and (jsonb_typeof(answers->b.id) is distinct from 'number' or (answers->>b.id)!~'^[0-2]$'))then raise exception 'BOSS_ANSWERS_INVALID';end if;
+  select count(*)into score from public.boss_questions b join private.boss_answers a on a.question_id=b.id where b.quest_id=q and (answers->>b.id)::integer=a.answer;
+  insert into public.boss_results values(u,q,score,1,case when score=3 then clock_timestamp()else null end)on conflict(user_id,quest_id)do update set score=excluded.score,attempts=public.boss_results.attempts+1,passed_at=excluded.passed_at;
+ end if;
+ update public.user_progress set revision=revision+1 where user_id=u;return private.snapshot();
+end $$;
+revoke all on function private.command(text,jsonb) from public,anon,authenticated;
+grant execute on function private.command(text,jsonb) to authenticated;
+
+-- Private images: no public URL or writes to another account's folder.
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)values('quest-evidence','quest-evidence',false,5242880,array['image/jpeg','image/png','image/webp'])on conflict(id)do nothing;
+create policy liferpg_evidence_upload on storage.objects for insert to authenticated with check(bucket_id='quest-evidence' and split_part(name,'/',1)=(select auth.uid())::text and exists(select 1 from public.quest_progress where user_id=(select auth.uid()) and quest_id=split_part(name,'/',2) and status in ('in_progress','completed')));
+create policy liferpg_evidence_read on storage.objects for select to authenticated using(bucket_id='quest-evidence' and split_part(name,'/',1)=(select auth.uid())::text);
+create policy liferpg_evidence_delete on storage.objects for delete to authenticated using(bucket_id='quest-evidence' and split_part(name,'/',1)=(select auth.uid())::text);
