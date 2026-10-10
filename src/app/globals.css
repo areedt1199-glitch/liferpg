@@ -556,3 +556,8 @@ button:disabled { opacity: .55; cursor: wait; }
 .credits { margin-top: 18px; display: grid; gap: 10px; } .credit-list { margin: 0; padding-left: 20px; display: grid; gap: 10px; } .credit-list li { display: grid; } .credit-list a { color: var(--forest); text-decoration: underline; }
 @media (max-width: 700px) { .arena-commands .options { grid-template-columns: 1fr; } .arena-stage { aspect-ratio: 4 / 3; } .arena-player { width: 22%; left: 8%; } .arena-boss { width: 34%; right: 6%; } .hpbar i { width: 12px; } .credit-link { margin-left: 0; } }
 @media (prefers-reduced-motion: reduce) { .arena-player, .arena-boss, .arena-stage, .float { animation-duration: .01ms !important; } }
+.arena-stage { aspect-ratio: 16 / 10; }
+.arena-scene { position: absolute; inset: 0; }
+.scene-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 58%; }
+.scene-heaven .scene-art { object-position: center 30%; } .scene-darkwood .scene-art { object-position: center 45%; }
+.scene-fx { position: absolute; inset: 0; width: 100%; height: 100%; }

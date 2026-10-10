@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { SceneId, SpriteId } from '../catalog';
 import type { Mode } from './engine';
 import { BOSS_SIZE, PLAYER_SIZE, drawBoss, drawPlayer, outlineOf } from './sprites';
-import { SCENE_H, SCENE_W, drawSceneStatic, particles } from './scenes';
+import { SCENE_H, SCENE_W, particles } from './scenes';
 
 const REDUCED = '(prefers-reduced-motion: reduce)';
 function subscribeMotion(notify: () => void) { const q = matchMedia(REDUCED); q.addEventListener('change', notify); return () => q.removeEventListener('change', notify); }
@@ -27,13 +27,13 @@ export function PixelPlayer({ color, trim, mode = 'idle', flash = false, classNa
   return <canvas ref={ref} width={PLAYER_SIZE} height={PLAYER_SIZE} className={`pixel ${className ?? ''}`} aria-hidden="true" />;
 }
 
-export function PixelScene({ scene, className }: { scene: SceneId; className?: string }) {
+/** Painted backdrop for a level plus a low-res animated particle layer. */
+export function PixelScene({ scene, level, className }: { scene: SceneId; level: number; className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null), frame = useFrame(160, true);
-  const base = useRef<{ id: SceneId; canvas: HTMLCanvasElement } | null>(null);
-  useEffect(() => {
-    const ctx = ref.current?.getContext('2d'); if (!ctx) return;
-    if (base.current?.id !== scene) { const c = document.createElement('canvas'); c.width = SCENE_W; c.height = SCENE_H; drawSceneStatic(scene).draw(c.getContext('2d')!); base.current = { id: scene, canvas: c }; }
-    ctx.clearRect(0, 0, SCENE_W, SCENE_H); ctx.drawImage(base.current.canvas, 0, 0); particles(ctx, scene, frame);
-  }, [scene, frame]);
-  return <canvas ref={ref} width={SCENE_W} height={SCENE_H} className={`pixel ${className ?? ''}`} aria-hidden="true" />;
+  useEffect(() => { const ctx = ref.current?.getContext('2d'); if (!ctx) return; ctx.clearRect(0, 0, SCENE_W, SCENE_H); particles(ctx, scene, frame); }, [scene, frame]);
+  return <div className={`scene-${scene} ${className ?? ''}`} aria-hidden="true">
+    {/* eslint-disable-next-line @next/next/no-img-element -- small static backdrop, scaled by CSS */}
+    <img src={`/images/battle/lv${level}.jpg`} alt="" className="scene-art" />
+    <canvas ref={ref} width={SCENE_W} height={SCENE_H} className="pixel scene-fx" />
+  </div>;
 }

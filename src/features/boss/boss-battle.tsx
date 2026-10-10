@@ -130,7 +130,7 @@ export function BossBattle({ quest }: { quest: Quest }) {
     </header>
 
     <div className={`arena-stage ${fx.shake ? 'shake' : ''} ${fx.bossFlash ? 'flash' : ''}`}>
-      <PixelScene scene={boss.scene} className="arena-scene" />
+      <PixelScene scene={boss.scene} level={boss.level} className="arena-scene" />
       <div className="hud hud-player"><span className="hud-name">คุณ</span><span className="hearts" aria-label={`หัวใจ ${playerHearts}/${hearts}`}>{Array.from({ length: hearts }, (_, i) => <i key={i} className={i < playerHearts ? '' : 'lost'}>♥</i>)}</span></div>
       <div className="hud hud-boss"><span className="hud-name">{boss.name}</span><span className="hpbar" aria-label={`พลังบอส ${bossHP}/${maxHP}`}>{Array.from({ length: maxHP }, (_, i) => <i key={i} className={i < bossHP ? '' : 'lost'} />)}</span></div>
       {battle && battle.combo >= 2 && !ended && <span className="combo">COMBO ×{battle.combo}</span>}
