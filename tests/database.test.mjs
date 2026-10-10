@@ -4,8 +4,10 @@ import fs from 'node:fs';
 import {PGlite} from '@electric-sql/pglite';
 // Real PostgreSQL SQL engine, with only the Supabase auth.uid/users boundary stubbed.
 // This is not a Supabase Auth/PostgREST integration or a multi-connection lock test.
+const ANSWERS={};
+async function loadAnswers(db){for(const k of Object.keys(ANSWERS))delete ANSWERS[k];for(const r of (await db.query('select b.quest_id,b.id,a.answer from public.boss_questions b join private.boss_answers a on a.question_id=b.id')).rows)(ANSWERS[r.quest_id]??={})[r.id]=r.answer;}
 const A='11111111-1111-4111-8111-111111111111', B='22222222-2222-4222-8222-222222222222';
-async function database(){
+async function database(before='~'){
  const db=await PGlite.create();
  await db.exec(`create role anon; create role authenticated; create schema auth; create table auth.users(id uuid primary key);
  create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
@@ -14,7 +16,9 @@ async function database(){
  create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
  create table storage.objects(id uuid,name text,bucket_id text);alter table storage.objects enable row level security;
  grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;`);
- for(const file of fs.readdirSync('supabase/migrations').sort())await db.exec(fs.readFileSync(`supabase/migrations/${file}`,'utf8').replace(/^\uFEFF/,''));
+ for(const file of fs.readdirSync('supabase/migrations').sort().filter(f=>f<before))await db.exec(fs.readFileSync(`supabase/migrations/${file}`,'utf8').replace(/^\uFEFF/,''));
+ // Server-side answer key lives in the private schema; read it as superuser so tests can win boss fights.
+ await loadAnswers(db);
  return db;
 }
 async function asUser(db,id,callback){
@@ -29,16 +33,15 @@ async function command(tx,action,payload){return (await tx.query('select public.
 async function fullChecklistAndBoss(tx,questId){
  const {rows}=await tx.query('select id from public.quest_steps where quest_id=$1 order by position',[questId]);
  for(const step of rows)await command(tx,'check',{questId,stepId:step.id,checked:true});
- const questions=(await tx.query('select id,position from public.boss_questions where quest_id=$1',[questId])).rows;
- await command(tx,'boss_attempt',{questId,answers:Object.fromEntries(questions.map(q=>[q.id,q.position-1]))});
+ await command(tx,'boss_attempt',{questId,answers:ANSWERS[questId]});
 }
 test('SQL migrations, seed replay, RLS ownership, grants and helper restrictions',async()=>{
  const db=await database();
  try {
   await asUser(db,A,tx=>snapshot(tx)); await asUser(db,B,tx=>snapshot(tx));
   await db.exec(fs.readFileSync('supabase/seed.sql','utf8')); await db.exec(fs.readFileSync('supabase/seed.sql','utf8'));
-  assert.equal((await db.query('select count(*)::int as n from public.quest_definitions')).rows[0].n,5);
-  assert.equal((await db.query('select count(*)::int as n from public.quest_steps')).rows[0].n,15);
+  assert.equal((await db.query('select count(*)::int as n from public.quest_definitions')).rows[0].n,8);
+  assert.equal((await db.query('select count(*)::int as n from public.quest_steps')).rows[0].n,24);
   await asUser(db,A,async tx=>{
    for(const table of ['profiles','user_progress','quest_progress','checklist','focus_sessions','reward_ledger']){
     const rows=(await tx.query(`select * from public.${table} where user_id=$1`,[B])).rows;
@@ -89,10 +92,10 @@ test('SQL focus pause/resume/expiry/manual new and full journey preserve server 
   assert.equal(expired.progress.quests.tools,'in_progress');assert.equal(expired.progress.totalXP,0);assert.equal(expired.progress.activeQuestId,'tools');
   await asUser(db,A,tx=>command(tx,'new',{questId:'tools'}));await asUser(db,A,tx=>command(tx,'new',{questId:'tools'}));
   assert.equal((await db.query('select count(*)::int as n from public.focus_sessions')).rows[0].n,2);
-  for(const id of ['tools','variables','loops','guess-number','improve-game']){
+  for(const id of ['tools','variables','loops','guess-number','improve-game','functions','high-score','publish-game']){
    await asUser(db,A,async tx=>{if(id!=='tools')await command(tx,'start_quest',{questId:id});await fullChecklistAndBoss(tx,id);await command(tx,'complete',{questId:id});});
   }
-  const final=await asUser(db,A,tx=>snapshot(tx));assert.equal(final.progress.totalXP,510);assert.equal(final.progress.coins,150);assert.ok(final.progress.goalCompletedAt);assert.equal(Object.keys(final.progress.rewards).length,5);
+  const final=await asUser(db,A,tx=>snapshot(tx));assert.equal(final.progress.totalXP,930);assert.equal(final.progress.coins,305);assert.ok(final.progress.goalCompletedAt);assert.equal(Object.keys(final.progress.rewards).length,8);
  }finally{await db.close();}
 });
 
@@ -132,5 +135,35 @@ test('SQL daily practice uses server day and rewards, caps per day, and coins ar
   const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.totalXP,0);assert.deepEqual(b.progress.practice,{});
   assert.equal((await asUser(db,B,tx=>tx.query('select * from public.practice_log where user_id=$1',[A]))).rows.length,0);
   for(const sql of ["delete from public.practice_log",`insert into public.practice_log values('${A}',current_date,'game_developer','learn_cpp',now(),10,5)`,"select private.growth_core('purchase','{}'::jsonb)","select private.snapshot_boss()"])await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
+ }finally{await db.close();}
+});
+test('SQL 8-level upgrade keeps finished players progress and reopens at level 6; boss totals scale per level',async()=>{
+ const db=await database('20261011120000');
+ try{
+  // Before the upgrade: old 3-question key is answer = position-1.
+  const old=async(tx,questId)=>{const {rows}=await tx.query('select id from public.quest_steps where quest_id=$1 order by position',[questId]);for(const s of rows)await command(tx,'check',{questId,stepId:s.id,checked:true});
+   const qs=(await tx.query('select id,position from public.boss_questions where quest_id=$1',[questId])).rows;await command(tx,'boss_attempt',{questId,answers:Object.fromEntries(qs.map(q=>[q.id,q.position-1]))});};
+  await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});for(const id of ['tools','variables','loops','guess-number','improve-game']){await command(tx,'start_quest',{questId:id});await old(tx,id);await command(tx,'complete',{questId:id});}});
+  await asUser(db,B,async tx=>{await command(tx,'select',{goalId:'first-game'});await command(tx,'start_quest',{questId:'tools'});});
+  assert.ok((await asUser(db,A,tx=>snapshot(tx))).progress.goalCompletedAt);
+  await db.exec(fs.readFileSync('supabase/migrations/20261011120000_eight_levels.sql','utf8'));
+  await loadAnswers(db);
+  const a=await asUser(db,A,tx=>snapshot(tx));
+  assert.equal(a.progress.goalCompletedAt,null);assert.equal(a.progress.totalXP,510);assert.equal(a.progress.quests.functions,'available');assert.equal(a.progress.quests['publish-game'],'locked');
+  assert.equal(a.progress.bosses.tools.total,3);assert.ok(a.progress.bosses.variables.passedAt,'legacy 3/3 win kept');
+  const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.activeQuestId,'tools');assert.equal(b.progress.quests.functions,'locked');
+  // Level 6 has 8 questions: 7/8 does not pass, a wrong-sized answer set is rejected, 8/8 passes.
+  await asUser(db,A,tx=>command(tx,'start_quest',{questId:'functions'}));
+  await asUser(db,A,async tx=>{const {rows}=await tx.query("select id from public.quest_steps where quest_id='functions'");for(const s of rows)await command(tx,'check',{questId:'functions',stepId:s.id,checked:true});});
+  const key=ANSWERS.functions,ids=Object.keys(key);assert.equal(ids.length,8);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'functions',answers:{[ids[0]]:key[ids[0]]}})),/BOSS_ANSWERS_INVALID/);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'functions',answers:{...key,[ids[0]]:9}})),/BOSS_ANSWERS_INVALID/);
+  let p=await asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'functions',answers:{...key,[ids[0]]:(key[ids[0]]+1)%4}}));
+  assert.equal(p.progress.bosses.functions.score,7);assert.equal(p.progress.bosses.functions.total,8);assert.equal(p.progress.bosses.functions.passedAt,null);
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'complete',{questId:'functions'})),/BOSS_REQUIRED/);
+  p=await asUser(db,A,tx=>command(tx,'boss_attempt',{questId:'functions',answers:key}));assert.ok(p.progress.bosses.functions.passedAt);assert.equal(p.progress.bosses.functions.attempts,2);
+  p=await asUser(db,A,tx=>command(tx,'complete',{questId:'functions'}));assert.equal(p.progress.totalXP,640);assert.equal(p.progress.quests['high-score'],'available');
+  await assert.rejects(()=>asUser(db,A,tx=>tx.exec("select private.command_boss3('boss_attempt','{}'::jsonb)")));
+  await assert.rejects(()=>asUser(db,A,tx=>tx.exec('select * from private.boss_answers')));
  }finally{await db.close();}
 });

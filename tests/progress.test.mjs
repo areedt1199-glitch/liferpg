@@ -139,12 +139,12 @@ test("two tabs serialize simultaneous timer/checklist writes and do not double a
   assert.equal(restarted.focus.tools.checkedStepIds.length, 2);
 });
 
-test("new user has no goal, no active quest, one available and four locked", () => {
+test("new user has no goal, no active quest, one available and seven locked", () => {
   const progress = rules.initialProgress();
   assert.equal(progress.selectedGoalId, null);
   assert.equal(progress.activeQuestId, null);
   assert.equal(progress.quests.tools, "available");
-  assert.equal(Object.values(progress.quests).filter(value => value === "locked").length, 4);
+  assert.equal(Object.values(progress.quests).filter(value => value === "locked").length, 7);
   assert.equal(Object.values(progress.quests).includes("completed"), false);
   assert.equal(rules.canFocus(progress, "tools"), false);
 });
@@ -214,6 +214,11 @@ test("stored progress round trips and rejects corrupt, old or inconsistent data"
   }
 });
 
+function fullyChecked(progress, questId) {
+  const quest = definitions.journeyDefinition.quests.find(q => q.id === questId);
+  for (const step of quest.steps) progress = rules.updateChecklist(progress, questId, step.id, true);
+  return progress;
+}
 function fullyCheckedAndBoss(progress, questId) {
   const quest = definitions.journeyDefinition.quests.find(q => q.id === questId);
   for (const step of quest.steps) progress = rules.updateChecklist(progress, questId, step.id, true);
@@ -242,7 +247,7 @@ test("completion requires all steps, ignores timer duration, closes actual time 
   assert.throws(() => rules.updateChecklist(completed, "tools", "hello-world", false));
   assert.throws(() => rules.updateRound(completed, "tools", "resume", 12000));
 });
-test("five quests unlock sequentially and complete goal without bonus or auto start", () => {
+test("eight quests unlock sequentially and complete goal without bonus or auto start", () => {
   let p = rules.selectGoal(rules.initialProgress(), "first-game");
   let xp = 0, coins = 0;
   for (const [index, quest] of definitions.journeyDefinition.quests.entries()) {
@@ -255,7 +260,7 @@ test("five quests unlock sequentially and complete goal without bonus or auto st
     assert.equal(Object.keys(p.rewards).length, index + 1);
     p = rules.parseProgress(JSON.stringify(p));
   }
-  assert.equal(p.goalCompletedAt, 1004);
+  assert.equal(p.goalCompletedAt, 1007); assert.equal(p.totalXP, 930); assert.equal(p.coins, 305);
   assert.equal(Object.values(p.quests).every(s => s === "completed"), true);
 });
 test("level boundaries and jumps use total XP", () => {
@@ -429,3 +434,45 @@ test('daily practice rewards once per task per Bangkok day, caps at three and bu
  assert.throws(()=>rules.parseProgress(JSON.stringify({...q,totalXP:q.totalXP+10})));
  const chart=chartRules.progressBuckets(q,2,day('2026-10-10T08:00:00Z'));assert.equal(chart[1].xp,150);assert.equal(chart[1].quests,1);
 });
+
+test('5-quest snapshots gain levels 6-8 without losing rewards; finished players reopen at level 6',()=>{
+ const legacy=p=>{const v=JSON.parse(JSON.stringify(p));for(const id of ['functions','high-score','publish-game']){delete v.quests[id];delete v.focus[id];}return v;};
+ let p=rules.selectGoal(rules.initialProgress(),'first-game');
+ for(const [i,q] of definitions.journeyDefinition.quests.slice(0,5).entries()){p=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(p,q.id),q.id),q.id,1000+i);}
+ const old=legacy(p);old.goalCompletedAt=1004;
+ const migrated=rules.parseProgress(JSON.stringify(old));
+ assert.equal(migrated.goalCompletedAt,null);assert.equal(migrated.quests.functions,'available');assert.equal(migrated.quests['publish-game'],'locked');
+ assert.equal(migrated.totalXP,510);assert.equal(Object.keys(migrated.rewards).length,5);
+ const resumed=rules.startQuest(migrated,'functions');assert.equal(resumed.activeQuestId,'functions');
+ // Mid-journey legacy player keeps the current quest.
+ let mid=rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools');
+ const midOld=legacy(mid);const m=rules.parseProgress(JSON.stringify(midOld));
+ assert.equal(m.quests.tools,'in_progress');assert.equal(m.quests.functions,'locked');
+ assert.throws(()=>rules.parseProgress(JSON.stringify({...midOld,quests:{tools:'in_progress'}})));
+});
+
+test('boss needs every question of its level; legacy 3/3 wins stay valid',()=>{
+ let p=fullyChecked(rules.startQuest(rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(rules.initialProgress(),'first-game'),'tools'),'tools'),'tools',1000),'variables'),'variables');
+ const qs=bossRules.bosses.variables.questions;assert.equal(qs.length,4);
+ const right=Object.fromEntries(qs.map(q=>[q.id,q.answer]));
+ const oneWrong={...right,[qs[0].id]:(qs[0].answer+1)%qs[0].options.length};
+ let r=rules.attemptBoss(p,'variables',oneWrong,2000);sameJSON(r.bosses.variables,{score:3,total:4,attempts:1,passedAt:null});
+ assert.throws(()=>rules.completeQuest(r,'variables',2100),/บอส/);
+ r=rules.attemptBoss(r,'variables',right,2200);sameJSON(r.bosses.variables,{score:4,total:4,attempts:2,passedAt:2200});
+ assert.equal(rules.parseProgress(JSON.stringify(r)).bosses.variables.total,4);
+ // A result saved before levels had more questions has no total and was graded out of 3.
+ const legacy={...r,bosses:{...r.bosses,variables:{score:3,attempts:1,passedAt:2200}}};
+ sameJSON(rules.parseProgress(JSON.stringify(legacy)).bosses.variables,{score:3,total:3,attempts:1,passedAt:2200});
+ for(const bad of [{score:3,total:4,attempts:1,passedAt:2200},{score:4,total:4,attempts:1,passedAt:null},{score:5,total:5,attempts:1,passedAt:1}])
+  assert.throws(()=>rules.parseProgress(JSON.stringify({...r,bosses:{...r.bosses,variables:bad}})));
+ assert.throws(()=>rules.attemptBoss(p,'variables',{[qs[0].id]:0},2300),/ครบ/);
+});
+
+test('language variants keep the same answer index as the shared answer key',()=>{
+ for(const boss of Object.values(bossRules.bosses))for(const q of boss.questions){
+  assert.ok(q.answer>=0&&q.answer<q.options.length,q.id);assert.ok(q.source.url.startsWith('https://'),q.id);
+  for(const lang of ['python','javascript']){const v=bossRules.questionView(q,lang);assert.equal(v.options.length,q.options.length,q.id);assert.ok(v.source.url.startsWith('https://'));}
+ }
+ assert.equal(Object.values(bossRules.bosses).map(b=>b.questions.length).join(),'3,4,5,6,7,8,9,10');
+});
+const sameJSON=(a,b)=>assert.equal(JSON.stringify(a),JSON.stringify(b));

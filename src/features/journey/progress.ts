@@ -3,7 +3,7 @@ import careers from '../careers/catalog.json';
 import { outfits, type PurchaseRecord } from '../wardrobe/catalog';
 import type { QuestStatus } from "@/features/quests/types";
 import { initialFocus, validateFocus, settleFocus, changeRound, type QuestFocus } from "../focus/rules";
-import { gradeBoss, type BossResult } from '../boss/catalog';
+import { bosses, gradeBoss, type BossResult } from '../boss/catalog';
 import { validateImageInfo, type EvidenceRecord } from '../evidence/types';
 import { bangkokDay } from '../analytics/rules';
 
@@ -53,12 +53,26 @@ export function startQuest(progress: UserProgress, questId: string): UserProgres
 export function canFocus(progress: UserProgress, questId: string): boolean {
   return journeyDefinition.quests.some(quest => quest.id === questId) && progress.selectedGoalId === journeyDefinition.id && progress.activeQuestId === questId && progress.quests[questId] === "in_progress";
 }
+const LEGACY_QUEST_COUNT = 5;
 // Migrate the same snapshot, without importing former sample UI balances.
 export function parseProgress(raw: string | null): UserProgress {
   if (raw === null) return initialProgress();
   const value = JSON.parse(raw) as Omit<UserProgress, "version"> & { version: number };
   const ids = journeyDefinition.quests.map(q => q.id);
   if (!value || ![1, 2, 3, 4, 5, 6].includes(value.version) || !value.quests || ![null, journeyDefinition.id].includes(value.selectedGoalId) || !(value.activeQuestId === null || ids.includes(value.activeQuestId))) throw new Error("ข้อมูลที่บันทึกไม่รองรับ");
+  // Snapshots saved when the journey had 5 quests: append the new quests untouched and reopen the goal,
+  // so players who already finished continue to the new levels without losing anything.
+  const known = ids.filter(id => id in value.quests);
+  if (known.length === LEGACY_QUEST_COUNT && known.every((id, i) => id === ids[i])) {
+    value.quests = { ...value.quests };
+    if (value.focus) value.focus = { ...value.focus };
+    for (const quest of journeyDefinition.quests.slice(known.length)) {
+      value.quests[quest.id] = "locked";
+      if (value.focus) value.focus[quest.id] = initialFocus(quest.minutes * 60_000);
+    }
+    if (known.every(id => value.quests[id] === "completed")) value.quests[ids[known.length]] = "available";
+    value.goalCompletedAt = null;
+  }
   const expected = initialProgress();
   let count = 0;
   if (value.version >= 3) {
@@ -116,8 +130,10 @@ export function parseProgress(raw: string | null): UserProgress {
   if(value.version>=5){
     if(!value.bosses||!value.evidence||typeof value.bosses!=='object'||typeof value.evidence!=='object'||Array.isArray(value.bosses)||Array.isArray(value.evidence))throw new Error('ข้อมูลบอสหรือภาพไม่รองรับ');
     for(const [id,r] of Object.entries(value.bosses)){
-      if(!ids.includes(id)||!['in_progress','completed'].includes(expected.quests[id])||!Number.isInteger(r.score)||r.score<0||r.score>3||!Number.isSafeInteger(r.attempts)||r.attempts<1||(r.passedAt!==null&&(!Number.isSafeInteger(r.passedAt)||r.passedAt<0||r.score!==3))||(r.score===3&&r.passedAt===null))throw new Error('ผลบอสไม่สอดคล้องกัน');
-      expected.bosses[id]={...r};
+      // Results from before bosses had N+2 questions were graded out of 3 and stay valid.
+      const total=r.total??3;
+      if(!ids.includes(id)||!bosses[id]||![3,bosses[id].questions.length].includes(total)||!['in_progress','completed'].includes(expected.quests[id])||!Number.isInteger(r.score)||r.score<0||r.score>total||!Number.isSafeInteger(r.attempts)||r.attempts<1||(r.passedAt!==null&&(!Number.isSafeInteger(r.passedAt)||r.passedAt<0||r.score!==total))||(r.score===total&&r.passedAt===null))throw new Error('ผลบอสไม่สอดคล้องกัน');
+      expected.bosses[id]={score:r.score,total,attempts:r.attempts,passedAt:r.passedAt};
     }
     for(const [id,e] of Object.entries(value.evidence)){
       validateImageInfo(e.mime,e.size);
@@ -171,8 +187,8 @@ export function attemptBoss(progress:UserProgress,questId:string,answers:Record<
  if(!quest.steps.every(s=>progress.focus[questId].checkedStepIds.includes(s.id)))throw new Error('ทำขั้นตอนย่อยให้ครบก่อนสู้บอส');
  if(!Number.isSafeInteger(now)||now<0)throw new Error('เวลาไม่ถูกต้อง');
  const old=progress.bosses[questId];if(old?.passedAt!=null)return progress;
- const score=gradeBoss(questId,answers);
- return {...progress,bosses:{...progress.bosses,[questId]:{score,attempts:(old?.attempts??0)+1,passedAt:score===3?now:null}}};
+ const score=gradeBoss(questId,answers);const total=bosses[questId].questions.length;
+ return {...progress,bosses:{...progress.bosses,[questId]:{score,total,attempts:(old?.attempts??0)+1,passedAt:score===total?now:null}}};
 }
 export function attachEvidence(progress:UserProgress,record:EvidenceRecord):UserProgress{
  if(!['in_progress','completed'].includes(progress.quests[record.questId]))throw new Error('เริ่มเควสต์ก่อนแนบภาพ');

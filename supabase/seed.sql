@@ -20,3 +20,15 @@ insert into public.quest_definitions(id,goal_id,position,title,task,place,succes
 insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','test-cases','1','ทดลองเล่นหลายกรณี') on conflict (quest_id,id) do nothing;
 insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','fix-errors','2','แก้ข้อผิดพลาดที่พบ') on conflict (quest_id,id) do nothing;
 insert into public.quest_steps(quest_id,id,position,text) values ('improve-game','summarize','3','สรุปสิ่งที่เรียนรู้') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('functions','first-game','6','ฟังก์ชันและจัดโค้ด','แยกโค้ดเกมเป็นฟังก์ชันที่ใช้ซ้ำได้','ห้องใต้ดินปราสาท','เกมทำงานเหมือนเดิม และโค้ดที่ซ้ำถูกแยกเป็นฟังก์ชัน','30','130','45') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('functions','write-function','1','เขียนฟังก์ชันตรวจคำตอบของผู้เล่น') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('functions','reuse-function','2','เรียกใช้ฟังก์ชันแทนโค้ดที่เขียนซ้ำ') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('functions','test-function','3','ทดสอบฟังก์ชันกับหลายค่า') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('high-score','first-game','7','ลิสต์และคะแนนสูงสุด','เก็บประวัติคะแนนในลิสต์และบันทึกคะแนนสูงสุด','ปราสาทมืด','ปิดแล้วเปิดเกมใหม่ ยังเห็นคะแนนสูงสุดเดิม','35','140','50') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('high-score','store-scores','1','เก็บจำนวนครั้งที่ทายของแต่ละรอบไว้ในลิสต์') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('high-score','find-best','2','หาคะแนนที่ดีที่สุดจากลิสต์') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('high-score','save-best','3','บันทึกคะแนนสูงสุดให้อยู่หลังปิดเกม') on conflict (quest_id,id) do nothing;
+insert into public.quest_definitions(id,goal_id,position,title,task,place,success,minutes,xp,coins) values ('publish-game','first-game','8','เผยแพร่เกมและรับฟีดแบ็ก','เขียน README ให้เพื่อนลองเล่น แล้วรวบรวมฟีดแบ็ก','สวรรค์ชั้นฟ้า','มีคนอื่นได้เล่นเกมของคุณ และคุณมีรายการสิ่งที่จะปรับต่อ','30','150','60') on conflict (id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('publish-game','write-readme','1','เขียน README บอกวิธีรันและวิธีเล่น') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('publish-game','share-game','2','ให้เพื่อนอย่างน้อย 1 คนลองเล่น') on conflict (quest_id,id) do nothing;
+insert into public.quest_steps(quest_id,id,position,text) values ('publish-game','collect-feedback','3','จดฟีดแบ็กและเลือกสิ่งที่จะปรับต่อ') on conflict (quest_id,id) do nothing;
