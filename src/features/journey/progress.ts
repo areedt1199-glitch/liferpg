@@ -5,11 +5,17 @@ import type { QuestStatus } from "@/features/quests/types";
 import { initialFocus, validateFocus, settleFocus, changeRound, type QuestFocus } from "../focus/rules";
 import { gradeBoss, type BossResult } from '../boss/catalog';
 import { validateImageInfo, type EvidenceRecord } from '../evidence/types';
+import { bangkokDay } from '../analytics/rules';
 
 export type RewardRecord = { questId: string; completedAt: number; xp: number; coins: number; totalXPBefore: number };
+export type PracticeRecord = { careerId: string; taskId: string; day: string; completedAt: number; xp: number; coins: number };
+// Daily career practice: small repeatable rewards, separate from the journey reward ledger.
+export const PRACTICE_XP = 10, PRACTICE_COINS = 5, PRACTICE_DAILY_LIMIT = 3;
+export const practiceKey = (day: string, careerId: string, taskId: string) => `${day}|${careerId}|${taskId}`;
 export function levelStats(totalXP: number) { return { level: 1 + Math.floor(totalXP / 100), currentXP: totalXP % 100, nextXP: 100 - totalXP % 100 }; }
 export type UserProgress = {
-  version: 5;
+  version: 6;
+  practice: Record<string, PracticeRecord>;
   bosses:Record<string,BossResult>;
   evidence:Record<string,EvidenceRecord>;
   careerId: string | null;
@@ -28,7 +34,7 @@ export const statusLabels: Record<QuestStatus, string> = {
   locked: "ล็อก", available: "พร้อมเริ่ม", in_progress: "กำลังทำ", completed: "ผ่านแล้ว",
 };
 export function initialProgress(): UserProgress {
-  return { version: 5, bosses:{}, evidence:{}, careerId:null, equippedOutfitId:'forest', purchases:{}, totalXP: 0, coins: 0, rewards: {}, goalCompletedAt: null, selectedGoalId: null, activeQuestId: null,
+  return { version: 6, practice:{}, bosses:{}, evidence:{}, careerId:null, equippedOutfitId:'forest', purchases:{}, totalXP: 0, coins: 0, rewards: {}, goalCompletedAt: null, selectedGoalId: null, activeQuestId: null,
     focus: Object.fromEntries(journeyDefinition.quests.map(quest => [quest.id, initialFocus(quest.minutes * 60_000)])),
     quests: Object.fromEntries(journeyDefinition.quests.map((quest, index) => [quest.id, index === 0 ? "available" : "locked"])) };
 }
@@ -52,7 +58,7 @@ export function parseProgress(raw: string | null): UserProgress {
   if (raw === null) return initialProgress();
   const value = JSON.parse(raw) as Omit<UserProgress, "version"> & { version: number };
   const ids = journeyDefinition.quests.map(q => q.id);
-  if (!value || ![1, 2, 3, 4, 5].includes(value.version) || !value.quests || ![null, journeyDefinition.id].includes(value.selectedGoalId) || !(value.activeQuestId === null || ids.includes(value.activeQuestId))) throw new Error("ข้อมูลที่บันทึกไม่รองรับ");
+  if (!value || ![1, 2, 3, 4, 5, 6].includes(value.version) || !value.quests || ![null, journeyDefinition.id].includes(value.selectedGoalId) || !(value.activeQuestId === null || ids.includes(value.activeQuestId))) throw new Error("ข้อมูลที่บันทึกไม่รองรับ");
   const expected = initialProgress();
   let count = 0;
   if (value.version >= 3) {
@@ -64,6 +70,17 @@ export function parseProgress(raw: string | null): UserProgress {
       expected.rewards[quest.id] = { ...record };
       expected.totalXP += record.xp; expected.coins += record.coins;
       expected.quests[quest.id] = "completed"; count++;
+    }
+    if(value.version>=6){
+      if(!value.practice||typeof value.practice!=='object'||Array.isArray(value.practice))throw new Error('ข้อมูลการฝึกไม่รองรับ');
+      const perDay:Record<string,number>={};
+      for(const [key,r] of Object.entries(value.practice)){
+        const career=careers.find(c=>c.id===r?.careerId);
+        if(!career||!career.tasks.some(t=>t.id===r.taskId)||!Number.isSafeInteger(r.completedAt)||r.completedAt<0||r.day!==bangkokDay(r.completedAt)||key!==practiceKey(r.day,r.careerId,r.taskId)||r.xp!==PRACTICE_XP||r.coins!==PRACTICE_COINS)throw new Error('ข้อมูลการฝึกไม่สอดคล้องกัน');
+        perDay[r.day]=(perDay[r.day]??0)+1;
+        if(perDay[r.day]>PRACTICE_DAILY_LIMIT)throw new Error('ข้อมูลการฝึกเกินจำนวนต่อวัน');
+        expected.practice[key]={...r};expected.totalXP+=r.xp;expected.coins+=r.coins;
+      }
     }
     if(value.version>=4){
       if(!(value.careerId===null||careers.some(c=>c.id===value.careerId))||!value.purchases||Array.isArray(value.purchases)||typeof value.purchases!=='object')throw new Error('ข้อมูลเส้นทางหรือร้านค้าไม่รองรับ');
@@ -96,7 +113,7 @@ export function parseProgress(raw: string | null): UserProgress {
       } else if (value.activeQuestId !== quest.id && (focus.checkedStepIds.length !== 0 || focus.totalMs !== 0 || focus.round.status !== "idle")) throw new Error("เควสต์ที่ยังไม่เริ่มมีข้อมูลโฟกัส");
     }
   }
-  if(value.version===5){
+  if(value.version>=5){
     if(!value.bosses||!value.evidence||typeof value.bosses!=='object'||typeof value.evidence!=='object'||Array.isArray(value.bosses)||Array.isArray(value.evidence))throw new Error('ข้อมูลบอสหรือภาพไม่รองรับ');
     for(const [id,r] of Object.entries(value.bosses)){
       if(!ids.includes(id)||!['in_progress','completed'].includes(expected.quests[id])||!Number.isInteger(r.score)||r.score<0||r.score>3||!Number.isSafeInteger(r.attempts)||r.attempts<1||(r.passedAt!==null&&(!Number.isSafeInteger(r.passedAt)||r.passedAt<0||r.score!==3))||(r.score===3&&r.passedAt===null))throw new Error('ผลบอสไม่สอดคล้องกัน');
@@ -121,7 +138,28 @@ export function completeQuest(progress: UserProgress, questId: string, now: numb
   // Close early without pretending the entire suggested duration was used.
   const closed = settled.round.status === "running" ? { ...settled, round: { ...settled.round, status: "paused" as const, startedAt: null } } : settled;
   const next = journeyDefinition.quests[index + 1];
-  return { ...progress, activeQuestId: null, quests: { ...progress.quests, [questId]: "completed", ...(next ? { [next.id]: "available" as const } : {}) }, focus: { ...progress.focus, [questId]: closed }, rewards: { ...progress.rewards, [questId]: { questId, completedAt: now, xp: quest.xp, coins: quest.coins, totalXPBefore: progress.totalXP } }, totalXP: progress.totalXP + quest.xp, coins: progress.coins + quest.coins, goalCompletedAt: next ? null : now };
+  return { ...progress, activeQuestId: null, quests: { ...progress.quests, [questId]: "completed", ...(next ? { [next.id]: "available" as const } : {}) }, focus: { ...progress.focus, [questId]: closed }, rewards: { ...progress.rewards, [questId]: { questId, completedAt: now, xp: quest.xp, coins: quest.coins, totalXPBefore: Object.values(progress.rewards).reduce((sum, r) => sum + r.xp, 0) } }, totalXP: progress.totalXP + quest.xp, coins: progress.coins + quest.coins, goalCompletedAt: next ? null : now };
+}
+export function practiceToday(progress:UserProgress,now:number){
+ const day=bangkokDay(now);return Object.values(progress.practice).filter(r=>r.day===day);
+}
+// Consecutive Bangkok days with practice, ending today (or yesterday while today is still open).
+export function practiceStreak(progress:UserProgress,now:number){
+ const days=new Set(Object.values(progress.practice).map(r=>r.day));
+ let cursor=new Date(`${bangkokDay(now)}T12:00:00+07:00`).getTime();
+ if(!days.has(bangkokDay(cursor)))cursor-=86_400_000;
+ let streak=0;while(days.has(bangkokDay(cursor))){streak++;cursor-=86_400_000;}
+ return streak;
+}
+export function completePractice(progress:UserProgress,taskId:string,now:number):UserProgress{
+ const career=careers.find(c=>c.id===progress.careerId);
+ if(!career)throw new Error('เลือกเส้นทางก่อนเริ่มฝึก');
+ if(!career.tasks.some(t=>t.id===taskId))throw new Error('ไม่พบงานฝึกนี้ในเส้นทางที่เลือก');
+ if(!Number.isSafeInteger(now)||now<0)throw new Error('เวลาไม่ถูกต้อง');
+ const day=bangkokDay(now);const key=practiceKey(day,career.id,taskId);
+ if(progress.practice[key])return progress;
+ if(practiceToday(progress,now).length>=PRACTICE_DAILY_LIMIT)throw new Error(`วันนี้ฝึกครบ ${PRACTICE_DAILY_LIMIT} งานแล้ว พรุ่งนี้มาต่อกัน`);
+ return {...progress,totalXP:progress.totalXP+PRACTICE_XP,coins:progress.coins+PRACTICE_COINS,practice:{...progress.practice,[key]:{careerId:career.id,taskId,day,completedAt:now,xp:PRACTICE_XP,coins:PRACTICE_COINS}}};
 }
 export function selectCareer(progress:UserProgress,careerId:string):UserProgress{
  if(!careers.some(c=>c.id===careerId))throw new Error('ไม่พบเส้นทางนี้');

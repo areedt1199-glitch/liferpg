@@ -28,8 +28,9 @@ export function CompletionResult({ quest, fresh }: { quest: Quest; fresh: boolea
   const { progress } = useProgress();
   const record = progress.rewards[quest.id];
   const next = journeyDefinition.quests[journeyDefinition.quests.findIndex(q => q.id === quest.id) + 1];
-  const before = levelStats(record.totalXPBefore).level;
-  const after = levelStats(record.totalXPBefore + record.xp).level;
+  // Level-up is shown only right after completion, when totalXP already includes this reward (and any daily practice).
+  const before = levelStats(progress.totalXP - record.xp).level;
+  const after = levelStats(progress.totalXP).level;
   return <section className="completion-result" aria-labelledby="result-title"><span className="reward-symbol" aria-hidden="true">✦</span><p className="eyebrow">{fresh ? "อีกก้าวที่คุณทำสำเร็จ" : "บันทึกเควสต์ที่ผ่านแล้ว"}</p><h1 id="result-title">{quest.title} สำเร็จแล้ว</h1><p>{quest.success}</p><div className="reward-values"><strong>+{record.xp} XP</strong><strong>+{record.coins} เหรียญ</strong></div><p className="muted">{fresh ? "บันทึกรางวัลแล้ว" : "ได้รับรางวัลนี้แล้ว รับซ้ำไม่ได้"} · ยืนยันด้วยตนเอง</p>{fresh && after > before && <p className="level-up" role="status">เลเวลอัป! {before} → {after}</p>}
     {next ? <><p>ก้าวถัดไป · {next.title}<br /><span className="muted">เปิดอ่านก่อน เริ่มเมื่อคุณพร้อม</span></p><div className="action-row"><Link className="primary-link" href={`/quests/${next.id}`}>ดูเควสต์ถัดไป →</Link><Link className="text-link" href="/today">พักก่อน</Link></div></> : <><h2>จบเส้นทาง “{journeyDefinition.title}” แล้ว</h2><p>ผ่านครบ 5/5 ด่าน · รวม {progress.totalXP} XP และ {progress.coins} เหรียญ</p><Link className="primary-link" href="/today">กลับหน้าวันนี้ →</Link></>}
     <EvidencePanel questId={quest.id}/><Link className="text-link" href={`/goals/${journeyDefinition.id}`}>ดูแผนที่การเดินทาง</Link>

@@ -51,7 +51,7 @@ test('SQL migrations, seed replay, RLS ownership, grants and helper restrictions
    await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
   await assert.rejects(()=>asUser(db,'',tx=>snapshot(tx)),/AUTH_REQUIRED/);
   const tables=(await db.query("select relname,relrowsecurity from pg_class join pg_namespace on pg_namespace.oid=relnamespace where nspname='public' and relkind='r'")).rows;
-  assert.equal(tables.length,16); assert.ok(tables.every(t=>t.relrowsecurity));
+  assert.equal(tables.length,18); assert.ok(tables.every(t=>t.relrowsecurity));
  } finally {await db.close();}
 });
 test('SQL atomic completion uses server rewards, checklist and unique ledger; retries preserve elapsed',async()=>{
@@ -99,7 +99,7 @@ test('SQL focus pause/resume/expiry/manual new and full journey preserve server 
 test('SQL growth purchases use latest funds, preserve quests and enforce owner-only access and AI quota',async()=>{
  const db=await database();try{
   await asUser(db,A,tx=>command(tx,'select_career',{careerId:'ui_ux_designer'}));
-  const initial=await asUser(db,A,tx=>snapshot(tx));assert.equal(initial.progress.careerId,'ui_ux_designer');assert.equal(initial.progress.version,5);
+  const initial=await asUser(db,A,tx=>snapshot(tx));assert.equal(initial.progress.careerId,'ui_ux_designer');assert.equal(initial.progress.version,6);
   await assert.rejects(()=>asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise',coins:0})),/COINS_INSUFFICIENT/);
   await assert.rejects(()=>asUser(db,A,tx=>command(tx,'equip',{itemId:'sunrise'})),/ITEM_NOT_OWNED/);
   await asUser(db,A,async tx=>{await command(tx,'select',{goalId:'first-game'});await command(tx,'start_quest',{questId:'tools'});await fullChecklistAndBoss(tx,'tools');await command(tx,'complete',{questId:'tools'});});
@@ -114,3 +114,23 @@ test('SQL growth purchases use latest funds, preserve quests and enforce owner-o
  }finally{await db.close();}
 });
 
+test('SQL daily practice uses server day and rewards, caps per day, and coins are spendable',async()=>{
+ const db=await database();try{
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp'})),/PRACTICE_CAREER_REQUIRED/);
+  await asUser(db,A,tx=>command(tx,'select_career',{careerId:'game_developer'}));
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'not-a-task'})),/PRACTICE_TASK_INVALID/);
+  let p=await asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp',xp:999,day:'2000-01-01'}));
+  assert.equal(p.progress.version,6);assert.equal(p.progress.totalXP,10);assert.equal(p.progress.coins,5);
+  const retry=await asUser(db,A,tx=>command(tx,'practice',{taskId:'learn_cpp'}));assert.deepEqual(retry.progress,p.progress);
+  await asUser(db,A,async tx=>{await command(tx,'practice',{taskId:'practice_unreal'});await command(tx,'practice',{taskId:'mini_game_project'});});
+  await assert.rejects(()=>asUser(db,A,tx=>command(tx,'practice',{taskId:'programming_challenge'})),/PRACTICE_LIMIT/);
+  // Yesterday's entries do not count toward today's cap; funds include practice coins.
+  await db.query("update public.practice_log set practice_day=practice_day-1,completed_at=completed_at-interval '1 day' where user_id=$1",[A]);
+  await asUser(db,A,async tx=>{for(const id of ['learn_cpp','practice_unreal','programming_challenge'])await command(tx,'practice',{taskId:id});});
+  p=await asUser(db,A,tx=>command(tx,'purchase',{itemId:'sunrise'}));assert.equal(p.progress.coins,0);assert.equal(p.progress.totalXP,60);
+  assert.equal(Object.keys(p.progress.practice).length,6);
+  const b=await asUser(db,B,tx=>snapshot(tx));assert.equal(b.progress.totalXP,0);assert.deepEqual(b.progress.practice,{});
+  assert.equal((await asUser(db,B,tx=>tx.query('select * from public.practice_log where user_id=$1',[A]))).rows.length,0);
+  for(const sql of ["delete from public.practice_log",`insert into public.practice_log values('${A}',current_date,'game_developer','learn_cpp',now(),10,5)`,"select private.growth_core('purchase','{}'::jsonb)","select private.snapshot_boss()"])await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
+ }finally{await db.close();}
+});

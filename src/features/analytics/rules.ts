@@ -4,5 +4,5 @@ const dayFormat=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'n
 export function bangkokDay(time:number){const parts=dayFormat.formatToParts(time);return ['year','month','day'].map(type=>parts.find(p=>p.type===type)!.value).join('-');}
 export function progressBuckets(progress:UserProgress,days:number,now:number){
  const today=new Date(`${bangkokDay(now)}T00:00:00+07:00`).getTime();
- return Array.from({length:days},(_,index)=>{const date=bangkokDay(today-(days-1-index)*86400000);const records=Object.values(progress.rewards).filter(r=>bangkokDay(r.completedAt)===date);return {date,xp:records.reduce((n,r)=>n+r.xp,0),coins:records.reduce((n,r)=>n+r.coins,0),quests:records.length};});
+ return Array.from({length:days},(_,index)=>{const date=bangkokDay(today-(days-1-index)*86400000);const records=Object.values(progress.rewards).filter(r=>bangkokDay(r.completedAt)===date);const practice=Object.values(progress.practice??{}).filter(r=>r.day===date);return {date,xp:[...records,...practice].reduce((n,r)=>n+r.xp,0),coins:[...records,...practice].reduce((n,r)=>n+r.coins,0),quests:records.length};});
 }

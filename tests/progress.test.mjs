@@ -21,7 +21,8 @@ const wardrobe=loadRules('src/features/wardrobe/catalog.ts');
 const careers=JSON.parse(fs.readFileSync('src/features/careers/catalog.json','utf8'));
 const bossRules=loadRules('src/features/boss/catalog.ts');
 const evidenceRules=loadRules('src/features/evidence/types.ts');
-const rules = loadRules("src/features/journey/progress.ts", { "./definitions": definitions, "../focus/rules": focusRules, '../careers/catalog.json':{default:careers}, '../wardrobe/catalog':wardrobe,'../boss/catalog':bossRules,'../evidence/types':evidenceRules });
+const chartRules=loadRules('src/features/analytics/rules.ts');
+const rules = loadRules("src/features/journey/progress.ts", { '../analytics/rules':chartRules, "./definitions": definitions, "../focus/rules": focusRules, '../careers/catalog.json':{default:careers}, '../wardrobe/catalog':wardrobe,'../boss/catalog':bossRules,'../evidence/types':evidenceRules });
 
 test("PostgreSQL jsonb key ordering does not invalidate a fresh account snapshot", () => {
   const progress = rules.initialProgress();
@@ -74,7 +75,7 @@ test("invalid focus ledger and step IDs are rejected; countdown cannot become ne
 test("version 1 migration preserves active quest and initializes stable checklist IDs", () => {
   const old = { version: 1, selectedGoalId: "first-game", activeQuestId: "tools", quests: { tools: "in_progress", variables: "locked", loops: "locked", "guess-number": "locked", "improve-game": "locked" } };
   const migrated = rules.parseProgress(JSON.stringify(old));
-  assert.equal(migrated.version, 5);
+  assert.equal(migrated.version, 6);
   assert.equal(migrated.activeQuestId, "tools");
   assert.equal(migrated.focus.tools.round.status, "idle");
   assert.equal(migrated.focus.tools.totalMs, 0);
@@ -271,7 +272,7 @@ test("version 2 migration preserves running round, checklist and active quest wi
   p = rules.updateRound(p,"tools","resume",21000);
   const old = { version:2, selectedGoalId:p.selectedGoalId, activeQuestId:p.activeQuestId, quests:p.quests, focus:p.focus };
   const migrated = rules.parseProgress(JSON.stringify(old));
-  assert.equal(migrated.version,5); assert.equal(migrated.totalXP,0); assert.equal(migrated.coins,0);
+  assert.equal(migrated.version,6); assert.equal(migrated.totalXP,0); assert.equal(migrated.coins,0);
   assert.equal(Object.keys(migrated.rewards).length,0);
   assert.equal(JSON.stringify(migrated.focus),JSON.stringify(old.focus));
   assert.equal(migrated.activeQuestId,"tools");
@@ -401,3 +402,30 @@ test('local lesson assistant retrieves authored content and reports unknown topi
  assert.equal(library.searchLibrary('ตัวแปร if else')[0].href,'/quests/variables');assert.equal(library.searchLibrary('เรื่องที่ไม่มีในคลังxyz').length,0);assert.equal(library.searchLibrary('UI/UX')[0].href,'/careers');
 });
 
+
+test('daily practice rewards once per task per Bangkok day, caps at three and builds a streak',()=>{
+ const day=t=>Date.parse(t);let p=rules.selectCareer(rules.initialProgress(),'english');
+ assert.throws(()=>rules.completePractice(rules.initialProgress(),'x',day('2026-10-10T03:00:00Z')),/เลือกเส้นทาง/);
+ assert.throws(()=>rules.completePractice(p,'learn_cpp',day('2026-10-10T03:00:00Z')),/ไม่พบงานฝึก/);
+ const tasks=careers.find(c=>c.id==='english').tasks.map(t=>t.id);
+ // 16:59Z and 17:01Z on Oct 9 are different Bangkok days.
+ p=rules.completePractice(p,tasks[0],day('2026-10-09T16:59:00Z'));
+ assert.equal(rules.completePractice(p,tasks[0],day('2026-10-09T16:59:30Z')),p);
+ p=rules.completePractice(p,tasks[0],day('2026-10-09T17:01:00Z'));
+ p=rules.completePractice(p,tasks[1],day('2026-10-10T01:00:00Z'));p=rules.completePractice(p,tasks[2],day('2026-10-10T02:00:00Z'));
+ assert.throws(()=>rules.completePractice(p,tasks[3],day('2026-10-10T03:00:00Z')),/ครบ 3/);
+ assert.equal(p.totalXP,40);assert.equal(p.coins,20);assert.equal(rules.practiceToday(p,day('2026-10-10T05:00:00Z')).length,3);
+ assert.equal(rules.practiceStreak(p,day('2026-10-10T05:00:00Z')),2);
+ assert.equal(rules.practiceStreak(p,day('2026-10-11T05:00:00Z')),2,'today not practised yet keeps yesterday streak');
+ assert.equal(rules.practiceStreak(p,day('2026-10-12T05:00:00Z')),0);
+ const parsed=rules.parseProgress(JSON.stringify(p));assert.deepEqual(parsed.practice,p.practice);assert.equal(parsed.totalXP,40);
+ // Practice coins are spendable and quest totalXPBefore stays ledger-only.
+ assert.throws(()=>rules.purchaseOutfit(p,'sunrise',day('2026-10-10T06:00:00Z')),/เหรียญไม่พอ/);
+ const q=rules.completeQuest(fullyCheckedAndBoss(rules.startQuest(rules.selectGoal(p,'first-game'),'tools'),'tools'),'tools',day('2026-10-10T07:00:00Z'));
+ assert.equal(q.rewards.tools.totalXPBefore,0);assert.equal(q.totalXP,160);assert.equal(rules.parseProgress(JSON.stringify(rules.purchaseOutfit(q,'sunrise',day('2026-10-10T07:30:00Z')))).coins,25);assert.equal(rules.parseProgress(JSON.stringify(q)).totalXP,160);
+ const key=Object.keys(p.practice)[0];
+ for(const bad of [{...p.practice[key],xp:99},{...p.practice[key],day:'2026-01-01'},{...p.practice[key],taskId:'learn_cpp'}])
+  assert.throws(()=>rules.parseProgress(JSON.stringify({...q,practice:{...q.practice,[key]:bad}})));
+ assert.throws(()=>rules.parseProgress(JSON.stringify({...q,totalXP:q.totalXP+10})));
+ const chart=chartRules.progressBuckets(q,2,day('2026-10-10T08:00:00Z'));assert.equal(chart[1].xp,150);assert.equal(chart[1].quests,1);
+});

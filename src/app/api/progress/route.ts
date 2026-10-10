@@ -24,12 +24,12 @@ export async function POST(request: Request) {
   try {
     const auth=await authorized(); if (!auth.client) return auth.error;
     const value=await request.json();
-    if (!value || !['select','start_quest','check','start','pause','resume','new','finish','complete','select_career','purchase','equip','boss_attempt'].includes(value.action) || !value.payload || typeof value.payload!=='object') return fail('คำสั่งไม่ถูกต้อง',400);
+    if (!value || !['select','start_quest','check','start','pause','resume','new','finish','complete','select_career','purchase','equip','boss_attempt','practice'].includes(value.action) || !value.payload || typeof value.payload!=='object') return fail('คำสั่งไม่ถูกต้อง',400);
     // No user ID, timestamp or balances from the browser are forwarded.
-    const payload={goalId:value.payload.goalId,questId:value.payload.questId,stepId:value.payload.stepId,checked:value.payload.checked,careerId:value.payload.careerId,itemId:value.payload.itemId,answers:value.payload.answers};
+    const payload={goalId:value.payload.goalId,questId:value.payload.questId,stepId:value.payload.stepId,checked:value.payload.checked,careerId:value.payload.careerId,itemId:value.payload.itemId,answers:value.payload.answers,taskId:value.payload.taskId};
     const {data,error}=await auth.client.rpc('liferpg_command',{action:value.action,payload});
     if (error || !data) {
-      const message=error?.message.includes('COINS_INSUFFICIENT')?'เหรียญไม่พอสำหรับชุดนี้':error?.message.includes('ITEM_NOT_OWNED')?'ซื้อชุดนี้ก่อนสวมใส่':error?.message.includes('CHECKLIST_INCOMPLETE') ? 'ทำขั้นตอนย่อยให้ครบก่อนยืนยัน' : error?.message.includes('QUEST_') ? 'เควสต์ไม่พร้อมหรือไม่ใช่เควสต์ที่กำลังทำ กรุณาโหลดข้อมูลล่าสุด' : 'บันทึกไม่สำเร็จ กรุณาลองใหม่';
+      const message=error?.message.includes('PRACTICE_LIMIT')?'วันนี้ฝึกครบ 3 งานแล้ว พรุ่งนี้มาต่อกัน':error?.message.includes('PRACTICE_')?'ยังฝึกงานนี้ไม่ได้ เลือกเส้นทางก่อนหรือโหลดข้อมูลล่าสุด':error?.message.includes('COINS_INSUFFICIENT')?'เหรียญไม่พอสำหรับชุดนี้':error?.message.includes('ITEM_NOT_OWNED')?'ซื้อชุดนี้ก่อนสวมใส่':error?.message.includes('CHECKLIST_INCOMPLETE') ? 'ทำขั้นตอนย่อยให้ครบก่อนยืนยัน' : error?.message.includes('QUEST_') ? 'เควสต์ไม่พร้อมหรือไม่ใช่เควสต์ที่กำลังทำ กรุณาโหลดข้อมูลล่าสุด' : 'บันทึกไม่สำเร็จ กรุณาลองใหม่';
       return fail(message,409);
     }
     return NextResponse.json(data,{headers:privateHeaders});
