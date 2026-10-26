@@ -1,34 +1,18 @@
 "use client";
 import { useActionState, useState, type FormEvent } from 'react';
-import { authenticate } from './actions';
+import { authenticate, signInWithGoogle } from './actions';
 import { emptyAuthState } from './messages';
 import { clearAccountView, notifyAccountChanged } from '@/features/journey/progress-store';
 
-const S = {
-  tabs: { display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '4px', marginBottom: '24px' } as const,
-  tabBtn: { flex: 1, minHeight: '42px', border: 0, borderRadius: '10px', background: 'transparent', color: 'rgba(241,223,173,0.5)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' } as const,
-  tabActive: { flex: 1, minHeight: '42px', border: 0, borderRadius: '10px', background: '#173e32', color: '#f1dfad', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' } as const,
-  heading: { fontSize: '22px', fontWeight: 700, color: '#f8f6ee', margin: '0 0 4px' } as const,
-  sub: { fontSize: '13px', color: 'rgba(241,223,173,0.45)', margin: '0 0 20px' } as const,
-  field: { marginBottom: '16px' } as const,
-  label: { display: 'block', fontSize: '13px', fontWeight: 600, color: 'rgba(241,223,173,0.7)', marginBottom: '6px' } as const,
-  inputWrap: { display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(241,223,173,0.15)', borderRadius: '12px', overflow: 'hidden' as const } as const,
-  icon: { width: '20px', height: '20px', flexShrink: 0, marginLeft: '14px', color: 'rgba(241,223,173,0.35)' } as const,
-  input: { flex: 1, minHeight: '48px', padding: '10px 14px', background: 'transparent', border: 0, outline: 'none', color: '#f8f6ee', fontSize: '14px', fontFamily: 'inherit' } as const,
-  eye: { flexShrink: 0, border: 0, background: 'transparent', padding: '8px 12px', fontSize: '16px', cursor: 'pointer', color: 'rgba(241,223,173,0.4)' } as const,
-  submit: { width: '100%', minHeight: '50px', marginTop: '8px', border: 0, borderRadius: '12px', background: 'linear-gradient(135deg, #173e32 0%, #1f5a48 100%)', color: '#f1dfad', fontSize: '15px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.3)', fontFamily: 'inherit' } as const,
-  note: { fontSize: '12px', color: 'rgba(241,223,173,0.4)', textAlign: 'center' as const, marginTop: '14px' } as const,
-  error: { fontSize: '13px', color: '#f5a623', background: 'rgba(245,166,35,0.1)', padding: '10px 14px', borderRadius: '10px', marginTop: '10px' } as const,
-  success: { fontSize: '13px', color: '#7dd3a0', background: 'rgba(125,211,160,0.1)', padding: '10px 14px', borderRadius: '10px', marginTop: '10px' } as const,
-};
-
-export function LoginForms() {
+/** Minimal sign-in / sign-up form for the /login page. */
+export function LoginForms({ startWithSignup = false, authError = false }: { startWithSignup?: boolean; authError?: boolean }) {
   const [authState, authAction, authPending] = useActionState(authenticate, emptyAuthState);
-  const [signup, setSignup] = useState(false);
+  const [googleState, googleAction, googlePending] = useActionState(signInWithGoogle, emptyAuthState);
+  const [signup, setSignup] = useState(startWithSignup);
   const [showPw, setShowPw] = useState(false);
-  const [showCf, setShowCf] = useState(false);
   const [formError, setFormError] = useState('');
   const [submittedMode, setSubmittedMode] = useState<boolean | null>(null);
+  const switchTo = (next: boolean) => { setSignup(next); setFormError(''); setShowPw(false); };
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     const fd = new FormData(e.currentTarget);
@@ -41,80 +25,32 @@ export function LoginForms() {
     clearAccountView(); notifyAccountChanged();
   }
 
-  return (
-    <>
-      <div style={S.tabs} role="group">
-        <button type="button" style={!signup ? S.tabActive : S.tabBtn}
-          onClick={() => { setSignup(false); setFormError(''); }}>เข้าสู่ระบบ</button>
-        <button type="button" style={signup ? S.tabActive : S.tabBtn}
-          onClick={() => { setSignup(true); setFormError(''); }}>สมัครสมาชิก</button>
-      </div>
-
-      <h2 style={S.heading}>{signup ? 'เริ่มการผจญภัย' : 'ยินดีต้อนรับกลับ'}</h2>
-      <p style={S.sub}>{signup ? 'สร้างบัญชีเพื่อเก็บความก้าวหน้า' : 'เข้าสู่ระบบเพื่อเดินทางต่อ'}</p>
-
-      <form key={signup ? 's' : 'l'} action={authAction} onSubmit={onSubmit}>
-        <input type="hidden" name="action" value={signup ? 'signup' : 'login'} />
-
-        <div style={S.field}>
-          <label style={S.label}>อีเมล</label>
-          <div style={S.inputWrap}>
-            <svg style={S.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="2" y="4" width="20" height="16" rx="3" /><path d="m2 7 10 6 10-6" />
-            </svg>
-            <input name="email" type="email" placeholder="email@example.com"
-              autoComplete="email" required disabled={authPending} style={S.input} />
-          </div>
-        </div>
-
-        <div style={S.field}>
-          <label style={S.label}>รหัสผ่าน</label>
-          <div style={S.inputWrap}>
-            <svg style={S.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="11" width="18" height="11" rx="3" /><path d="M7 11V7a5 5 0 0110 0v4" />
-            </svg>
-            <input name="password" type={showPw ? 'text' : 'password'}
-              placeholder="อย่างน้อย 8 ตัวอักษร" autoComplete={signup ? 'new-password' : 'current-password'}
-              minLength={8} required disabled={authPending} style={S.input} />
-            <button type="button" style={S.eye} onClick={() => setShowPw(v => !v)}>
-              {showPw ? '🙈' : '👁️'}
-            </button>
-          </div>
-        </div>
-
-        {signup && (
-          <div style={S.field}>
-            <label style={S.label}>ยืนยันรหัสผ่าน</label>
-            <div style={S.inputWrap}>
-              <svg style={S.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="3" /><path d="M7 11V7a5 5 0 0110 0v4" />
-              </svg>
-              <input name="confirmPassword" type={showCf ? 'text' : 'password'}
-                placeholder="รหัสผ่านอีกครั้ง" autoComplete="new-password"
-                minLength={8} required disabled={authPending} style={S.input} />
-              <button type="button" style={S.eye} onClick={() => setShowCf(v => !v)}>
-                {showCf ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {formError && <p style={S.error} role="alert">{formError}</p>}
-
-        <button type="submit" disabled={authPending} style={{
-          ...S.submit, opacity: authPending ? 0.5 : 1,
-        }}>
-          {authPending ? 'กำลังส่ง…' : signup ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'}
-        </button>
-
-        {signup && <p style={S.note}>หลังสมัคร ให้เปิดอีเมลยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบ</p>}
-      </form>
-
-      {submittedMode === signup && authState.message && (
-        <p style={authState.error ? S.error : S.success} role={authState.error ? 'alert' : 'status'}>
-          {authState.message}
-        </p>
-      )}
-    </>
-  );
+  return <>
+    <h1 className="login-title">{signup ? 'เริ่มการผจญภัย' : 'ยินดีต้อนรับกลับ'}</h1>
+    <p className="login-sub">{signup ? 'สร้างบัญชีเพื่อเก็บความก้าวหน้าไว้ทุกเครื่อง' : 'เข้าสู่ระบบเพื่อเดินทางต่อจากที่ค้างไว้'}</p>
+    {authError && <p className="login-alert" role="alert">ยืนยันอีเมลไม่สำเร็จ ลิงก์อาจหมดอายุ กรุณาเข้าสู่ระบบหรือขออีเมลใหม่</p>}
+    <form action={googleAction} onSubmit={() => { clearAccountView(); notifyAccountChanged(); }}>
+      <button type="submit" className="login-google" disabled={googlePending || authPending}>
+        <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        {googlePending ? 'กำลังไปที่ Google…' : signup ? 'สมัครด้วย Google' : 'เข้าสู่ระบบด้วย Google'}
+      </button>
+    </form>
+    {googleState.message && <p className="login-alert" role="alert">{googleState.message}</p>}
+    <div className="login-or"><span>หรือใช้อีเมล</span></div>
+    <form key={signup ? 's' : 'l'} className="login-form" action={authAction} onSubmit={onSubmit}>
+      <input type="hidden" name="action" value={signup ? 'signup' : 'login'} />
+      <label className="login-field"><span>อีเมล</span>
+        <input name="email" type="email" placeholder="email@example.com" autoComplete="email" required disabled={authPending} /></label>
+      <label className="login-field"><span>รหัสผ่าน</span>
+        <span className="login-password"><input name="password" type={showPw ? 'text' : 'password'} placeholder="อย่างน้อย 8 ตัวอักษร" autoComplete={signup ? 'new-password' : 'current-password'} minLength={8} required disabled={authPending} />
+          <button type="button" className="login-reveal" onClick={() => setShowPw(v => !v)} aria-pressed={showPw}>{showPw ? 'ซ่อน' : 'แสดง'}</button></span></label>
+      {signup && <label className="login-field"><span>ยืนยันรหัสผ่าน</span>
+        <input name="confirmPassword" type={showPw ? 'text' : 'password'} placeholder="พิมพ์รหัสผ่านอีกครั้ง" autoComplete="new-password" minLength={8} required disabled={authPending} /></label>}
+      {formError && <p className="login-alert" role="alert">{formError}</p>}
+      <button type="submit" className="login-submit" disabled={authPending}>{authPending ? 'กำลังส่ง…' : signup ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'}</button>
+      {signup && <p className="login-fine">หลังสมัคร เปิดอีเมลยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบ</p>}
+    </form>
+    {submittedMode === signup && authState.message && <p className={authState.error ? 'login-alert' : 'login-ok'} role={authState.error ? 'alert' : 'status'}>{authState.message}</p>}
+    <p className="login-switch">{signup ? 'มีบัญชีอยู่แล้ว?' : 'ยังไม่มีบัญชี?'} <button type="button" onClick={() => switchTo(!signup)}>{signup ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'}</button></p>
+  </>;
 }

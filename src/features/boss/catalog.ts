@@ -1,6 +1,8 @@
 // Boss battles for the "first-game" journey. Level N has N+2 questions.
 // Authoring rule: the correct option is written FIRST; arrange() shuffles deterministically by question id,
 // so the browser, tests and the SQL generator (scripts/generate-boss-v2-migration.mjs) all agree on the answer index.
+import { knowledgePaths } from '../knowledge';
+import { pathQuestId } from '../journey/definitions';
 export type CodeLang = 'python' | 'javascript';
 export const codeLangs: Record<CodeLang, string> = { python: 'Python', javascript: 'JavaScript' };
 export type Source = { title: string; url: string };
@@ -134,7 +136,28 @@ const raw: Record<string, Omit<Boss, 'questions'> & { questions: Draft[] }> = {
     ] },
 };
 
-export const bosses: Record<string, Boss> = Object.fromEntries(Object.entries(raw).map(([questId, b]) => [questId, { ...b, questions: b.questions.map(arrange) }]));
+const gameBosses: Record<string, Boss> = Object.fromEntries(Object.entries(raw).map(([questId, b]) => [questId, { ...b, questions: b.questions.map(arrange) }]));
+
+// Path goals reuse the level-N boss look and fight 3 knowledge-quiz questions each. Windows slide through a pool
+// (easy → hard) so every level has 3; ids are per quest because neighbouring windows share a question.
+// The career-task levels slide through the 9 base questions (unchanged since they shipped, the server stores them);
+// the advanced levels slide through the base hard questions plus the advanced ones.
+const byLevel = Object.values(gameBosses).sort((a, b) => a.level - b.level);
+const windowStart = (i: number, levels: number, pool: number) => levels > 1 ? Math.round(i * (pool - 3) / (levels - 1)) : 0;
+const pathBosses: Record<string, Boss> = Object.fromEntries(knowledgePaths().flatMap(k => {
+  const base = k.quiz.slice(0, k.baseQuiz), extraLevels = k.lessons.length - k.baseLessons;
+  const pool = [...base.filter(q => q.level === 3), ...k.quiz.slice(k.baseQuiz)].sort((a, b) => a.level - b.level);
+  return k.lessons.map((l, i) => {
+    const look = byLevel[Math.min(i, byLevel.length - 1)];
+    const picked = i < k.baseLessons
+      ? base.slice(windowStart(i, k.baseLessons, base.length), windowStart(i, k.baseLessons, base.length) + 3)
+      : pool.slice(windowStart(i - k.baseLessons, extraLevels, pool.length), windowStart(i - k.baseLessons, extraLevels, pool.length) + 3);
+    const questId = pathQuestId(k.pathId, l.taskId);
+    const questions = picked.map(q => ({ id: `${questId}~${q.id}`, prompt: q.prompt, code: q.code, options: q.options, answer: q.answer, explanation: q.explanation, source: q.source }));
+    return [questId, { ...look, level: i + 1, questions }] as const;
+  });
+}));
+export const bosses: Record<string, Boss> = { ...gameBosses, ...pathBosses };
 /** Hearts scale with the fight length so the 10-question finale is still winnable. */
 export const heartsFor = (boss: Boss) => 3 + Math.floor((boss.level - 1) / 3);
 

@@ -1,7 +1,6 @@
 // Generates the 8-level migration from definitions.ts and boss/catalog.ts (single source of truth for answers).
 // Run: node scripts/generate-boss-v2-migration.mjs
-import fs from 'node:fs'; import ts from 'typescript'; import vm from 'node:vm';
-const load = file => { const exports = {}; vm.runInNewContext(ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, { exports }); return exports; };
+import fs from 'node:fs'; import { loadTs as load } from './load-ts.mjs';
 const { journeyDefinition: goal } = load('src/features/journey/definitions.ts');
 const { bosses } = load('src/features/boss/catalog.ts');
 const quote = value => "'" + String(value).replaceAll("'", "''") + "'";

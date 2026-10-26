@@ -22,6 +22,20 @@ export async function authenticate(_previous: AuthState, form: FormData): Promis
   } catch { return {message:authMessage(),error:true}; }
   redirect('/profile');
 }
+export async function signInWithGoogle(previous: AuthState): Promise<AuthState> {
+  void previous;
+  const client = await serverClient();
+  if (!client) return { message: 'ยังไม่ได้ตั้งค่าฐานข้อมูล', error: true };
+  let url: string;
+  try {
+    const origin = (await headers()).get('origin');
+    if (!origin || !['http:','https:'].includes(new URL(origin).protocol)) return {message:'เปิดแบบฟอร์มจากเว็บไซต์ liferpg แล้วลองใหม่',error:true};
+    const {data,error} = await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:`${origin}/auth/callback`,queryParams:{prompt:'select_account'}}});
+    if (error || !data.url) return {message:authMessage(error?.code),error:true};
+    url = data.url;
+  } catch { return {message:authMessage(),error:true}; }
+  redirect(url);
+}
 export async function signOut(previous: AuthState): Promise<AuthState> {
   void previous;
   const client = await serverClient();

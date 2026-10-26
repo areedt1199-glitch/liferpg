@@ -8,9 +8,10 @@ import { trackFor } from './music';
 import { usePref, writePref } from './prefs';
 import { PixelScene, useReducedMotion } from './pixel/pixel-canvas';
 import { bossImage } from './boss-avatar';
+import { AttackFx, hasAttack, preloadAttack } from './attack-fx';
 import type { Mode } from './pixel/engine';
 import { items, skinById, skinImage, STARTER_SKIN, type ItemId } from '../shop/catalog';
-import { inventory } from '../journey/progress';
+import { inventory, reviewPassed } from '../journey/progress';
 import { spendItem, submitBoss, useProgress } from '../journey/progress-store';
 import type { Quest } from '../quests/types';
 
@@ -28,13 +29,16 @@ function tone(freqs: number[], dur = .09, type: OscillatorType = 'square') {
 }
 
 export function BossBattle({ quest }: { quest: Quest }) {
-  const { progress } = useProgress();
+  const { progress, mode } = useProgress();
   const boss = bosses[quest.id], track = trackFor(boss.music);
   const result = progress.bosses[quest.id], passed = result?.passedAt != null;
-  const ready = quest.steps.every(s => progress.focus[quest.id].checkedStepIds.includes(s.id));
+  const stepsDone = quest.steps.every(s => progress.focus[quest.id].checkedStepIds.includes(s.id));
+  const reviewed = reviewPassed(progress, quest.id, mode === 'demo'), ready = stepsDone && reviewed;
   const skin = skinById(progress.equippedSkinId) ?? skinById(STARTER_SKIN)!, bag = inventory(progress);
   const lang = usePref<CodeLang>('liferpg.codeLang', 'python', LANGS), music = usePref('liferpg.music', 'on', ONOFF), sfx = usePref('liferpg.sfx', 'on', ONOFF);
   const reduce = useReducedMotion();
+  // Painted attack flipbooks replace the lunge when the character has one (static lunge under reduced motion).
+  const playerFx = !reduce && hasAttack('skin', skin.id), bossFx = !reduce && hasAttack('boss', boss.sprite);
 
   const [battle, setBattle] = useState<Battle | null>(null);
   const [hp, setHp] = useState<{ boss: number; hearts: number } | null>(null);
@@ -57,6 +61,7 @@ export function BossBattle({ quest }: { quest: Quest }) {
     void audio.current.play().catch(() => { /* blocked until a user gesture */ });
   }, [music, track]);
   useEffect(() => () => { run.current++; audio.current?.pause(); }, []);
+  useEffect(() => { if (playerFx) preloadAttack('skin', skin.id); if (bossFx) preloadAttack('boss', boss.sprite); }, [playerFx, bossFx, skin.id, boss.sprite]);
   useEffect(() => { if (music === 'off') audio.current?.pause(); }, [music]);
 
   async function saveResult(answers: Record<string, number>) {
@@ -77,13 +82,13 @@ export function BossBattle({ quest }: { quest: Quest }) {
     const token = run.current, turn = answer(battle, boss, chosen), q = boss.questions[battle.current!];
     setBusy(true); setPicked({ chosen, answer: turn.answer });
     if (turn.correct) {
-      beep([523, 784], .07); setFx({ ...calm, player: 'attack', playerMove: 'lunge' }); await wait(260); if (token !== run.current) return;
-      setFx({ ...calm, player: 'attack', boss: 'hit', bossFlash: true, bossMove: 'hit' }); setHp({ boss: turn.battle.bossHP, hearts: turn.battle.hearts });
+      beep([523, 784], .07); setFx({ ...calm, player: 'attack', playerMove: playerFx ? 'casting' : 'lunge' }); await wait(playerFx ? 330 : 260); if (token !== run.current) return;
+      setFx({ ...calm, player: 'attack', boss: 'hit', bossFlash: true, bossMove: 'hit', playerMove: playerFx ? 'casting' : '' }); setHp({ boss: turn.battle.bossHP, hearts: turn.battle.hearts });
       float(turn.power > 1 ? '×2 −2' : turn.crit ? 'CRITICAL! −1' : '−1', turn.crit || turn.power > 1 ? 'crit' : 'boss'); unflash(token);
       setLine({ speaker: 'ระบบ', text: turn.battle.phase === 'victory' ? `${boss.name} ล้มลงแล้ว!` : boss.hurt[turn.battle.turns % boss.hurt.length] });
     } else {
-      beep([196, 147], .12, 'sawtooth'); setFx({ ...calm, boss: 'attack', bossMove: 'boss-lunge' }); await wait(300); if (token !== run.current) return;
-      setFx({ ...calm, boss: 'attack', player: 'hit', playerFlash: true, playerMove: 'hit', shake: true }); setHp({ boss: turn.battle.bossHP, hearts: turn.battle.hearts });
+      beep([196, 147], .12, 'sawtooth'); setFx({ ...calm, boss: 'attack', bossMove: bossFx ? 'casting' : 'boss-lunge' }); await wait(bossFx ? 330 : 300); if (token !== run.current) return;
+      setFx({ ...calm, boss: 'attack', player: 'hit', playerFlash: true, playerMove: 'hit', bossMove: bossFx ? 'casting' : '', shake: true }); setHp({ boss: turn.battle.bossHP, hearts: turn.battle.hearts });
       float('−♥', 'player'); unflash(token); setLine({ speaker: boss.name, text: boss.attack });
     }
     setFeedback({ ok: turn.correct, crit: turn.crit, questionId: q.id });
@@ -135,7 +140,7 @@ export function BossBattle({ quest }: { quest: Quest }) {
     <header className="arena-head">
       <div><p className="eyebrow">BOSS · ด่าน {boss.level}</p><h3 id={`boss-${quest.id}`}>{boss.name}</h3><p className="muted">{maxHP} คำถาม · หัวใจ {hearts} ดวง · ตอบผิดแล้วข้อนั้นจะวนกลับมา</p></div>
       <div className="arena-prefs">
-        <div className="seg" role="group" aria-label="ภาษาโค้ดในคำถาม">{LANGS.map(l => <button key={l} type="button" aria-pressed={lang === l} onClick={() => writePref('liferpg.codeLang', l)}>{codeLangs[l]}</button>)}</div>
+        {boss.questions.some(q => q.lang) && <div className="seg" role="group" aria-label="ภาษาโค้ดในคำถาม">{LANGS.map(l => <button key={l} type="button" aria-pressed={lang === l} onClick={() => writePref('liferpg.codeLang', l)}>{codeLangs[l]}</button>)}</div>}
         <button type="button" className="pref-toggle" aria-pressed={music === 'on'} onClick={() => { const next = music === 'on' ? 'off' : 'on'; writePref('liferpg.music', next); if (next === 'on' && playing) playMusic(); }}>{music === 'on' ? '♪ เพลง: เปิด' : '♪ เพลง: ปิด'}</button>
         <button type="button" className="pref-toggle" aria-pressed={sfx === 'on'} onClick={() => writePref('liferpg.sfx', sfx === 'on' ? 'off' : 'on')}>{sfx === 'on' ? 'เสียงเอฟเฟกต์: เปิด' : 'เสียงเอฟเฟกต์: ปิด'}</button>
       </div>
@@ -146,8 +151,8 @@ export function BossBattle({ quest }: { quest: Quest }) {
       <div className="hud hud-player"><span className="hud-name"><img className="hud-skin" src={skinImage(skin.id)} alt="" />คุณ · {skin.name}</span><span className="hearts" aria-label={`หัวใจ ${playerHearts}/${heartSlots}`}>{Array.from({ length: heartSlots }, (_, i) => <i key={i} className={i < playerHearts ? '' : 'lost'}>♥</i>)}</span></div>
       <div className="hud hud-boss"><span className="hud-name">{boss.name}</span><span className="hpbar" aria-label={`พลังบอส ${bossHP}/${maxHP}`}>{Array.from({ length: maxHP }, (_, i) => <i key={i} className={i < bossHP ? '' : 'lost'} />)}</span></div>
       {battle && battle.combo >= 2 && !ended && <span className="combo">COMBO ×{battle.combo}</span>}
-      <div className={`arena-player ${fx.playerMove}`}><img src={skinImage(skin.id)} alt="" className={`sprite player-sprite ${fx.player} ${fx.playerFlash ? 'flash' : ''}`} /></div>
-      <div className={`arena-boss ${fx.bossMove}`}><img src={bossImage(boss.sprite)} alt={`${boss.name}${passed ? ' · ชนะแล้ว' : ''}`} className={`sprite boss-sprite boss-${boss.sprite} ${bossMode} ${fx.bossFlash ? 'flash' : ''}`} /></div>
+      <div className={`arena-player ${fx.playerMove}`}><img src={skinImage(skin.id)} alt="" className={`sprite player-sprite ${fx.player} ${fx.playerFlash ? 'flash' : ''}`} />{fx.playerMove === 'casting' && <AttackFx kind="skin" id={skin.id} />}</div>
+      <div className={`arena-boss ${fx.bossMove}`}><img src={bossImage(boss.sprite)} alt={`${boss.name}${passed ? ' · ชนะแล้ว' : ''}`} className={`sprite boss-sprite boss-${boss.sprite} ${bossMode} ${fx.bossFlash ? 'flash' : ''}`} />{fx.bossMove === 'casting' && <AttackFx kind="boss" id={boss.sprite} />}</div>
       {floats.map(f => <span key={f.id} className={`float float-${f.kind}`} aria-hidden="true">{f.text}</span>)}
       {ended && <div className={`arena-result ${battle.phase}`} role="status">
         <strong>{battle.phase === 'victory' ? 'VICTORY!' : 'DEFEAT'}</strong>
@@ -176,7 +181,7 @@ export function BossBattle({ quest }: { quest: Quest }) {
           : playing && <><button id="boss-hint" type="button" className="pref-toggle" disabled={busy || battle.hint < 1 || battle.removed !== null} onClick={hint}>🧪 คำใบ้ · เหลือ {battle.hint}</button><button type="button" className="pref-toggle" disabled={busy} onClick={flee}>ถอย</button>
             <span className="potion-bar" role="group" aria-label="ไอเทมในกระเป๋า">{items.map(it => <button key={it.id} type="button" className="potion-btn" title={it.effect} disabled={busy || bag[it.id] < 1 || (it.id === 'reveal' && battle.revealed)} onClick={() => void drink(it.id)}><i style={{ background: it.liquid }} aria-hidden="true" />{it.name} ×{bag[it.id]}</button>)}</span>
             {battle.armed > 0 && <span className="armed">พลัง ×2 พร้อม ({battle.armed})</span>}</>}
-        <span className="muted">{!ready ? 'เช็กขั้นตอนการเรียนให้ครบก่อนสู้บอส' : passed && !battle ? `✓ ชนะบอสแล้ว · ${result!.score}/${result!.total} ข้อ` : ended ? 'จบการต่อสู้' : battle ? `เทิร์น ${battle.turns} · กดเลข 1–4 เพื่อตอบ · H ใช้คำใบ้` : 'ชนะเมื่อตอบถูกครบทุกข้อก่อนหัวใจหมด'}</span>
+        <span className="muted">{!stepsDone ? 'เช็กขั้นตอนการเรียนให้ครบก่อนสู้บอส' : !reviewed ? 'ส่งงานให้อาจารย์ตรวจผ่านก่อนสู้บอส' : passed && !battle ? `✓ ชนะบอสแล้ว · ${result!.score}/${result!.total} ข้อ` : ended ? 'จบการต่อสู้' : battle ? `เทิร์น ${battle.turns} · กดเลข 1–4 เพื่อตอบ · H ใช้คำใบ้` : 'ชนะเมื่อตอบถูกครบทุกข้อก่อนหัวใจหมด'}</span>
         {track && <Link className="credit-link" href="/credits">เพลง: {track.title} · {track.author} ({track.license})</Link>}
       </div>
     </div>

@@ -1,9 +1,7 @@
 import fs from 'node:fs';
-import vm from 'node:vm';
-import ts from 'typescript';
+import { loadTs } from './load-ts.mjs';
 if(process.argv.includes('--initial-migration'))throw new Error('Initial definitions migration is already applied; create a new CLI migration for changes.');
-const exports = {};
-vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/features/journey/definitions.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports});
+const exports = loadTs('src/features/journey/definitions.ts');
 const goal=exports.journeyDefinition;
 const quote=value=>"'"+String(value).replaceAll("'","''")+"'";
 let sql='-- Generated from definitions.ts; reviewed, immutable content for this migration.\n';

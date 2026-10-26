@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { IntroPage } from '@/components/ui/intro-page';
 import { serverClient } from '@/lib/supabase/server';
 import { supabaseConfig } from '@/lib/supabase/config';
@@ -20,6 +21,8 @@ export default async function ProfilePage({searchParams}:{searchParams:Promise<{
   }catch{problem='ติดต่อระบบบัญชีไม่สำเร็จ กรุณาลองใหม่';}
  }
  const query=await searchParams;
+ // Signed-out players use the dedicated /login page; demo players keep this page to switch modes.
+ if(configured&&!email&&!problem&&mode==='account')redirect(query.auth==='error'?'/login?auth=error':'/login');
  return <IntroPage eyebrow="YOUR LITTLE CORNER" title={email?'โปรไฟล์':'ยินดีต้อนรับสู่ liferpg'} description="ทุกก้าวเล็ก ๆ คือจุดเริ่มต้นของการผจญภัย"><section className={`account-panel ${!email&&configured?'auth-card':''}`}>
  {!email&&configured&&<aside className="auth-welcome"><p className="eyebrow">WELCOME, ADVENTURER</p><h2>เริ่มบทใหม่<br/>ในแบบของคุณ</h2><p>เรียนรู้ทีละด่าน เก็บความสำเร็จเล็ก ๆ<br/>แล้วเติบโตไปพร้อมตัวละครของคุณ</p><div className="auth-forest" aria-hidden="true"><span>♧</span><span>♧</span><span>♧</span></div><p className="auth-welcome-note">YOUR LIFE. YOUR QUEST.</p></aside>}
  <div className="auth-content"><p className="sample-label">{mode==='demo'?'กำลังใช้ demo':'โหมดบัญชีจริง'}</p><h2>{configured?'บัญชี liferpg':'ยังไม่ได้ตั้งค่าฐานข้อมูล'}</h2>{!configured?<p>ตั้งค่า Supabase และ environment ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ<br />ข้อมูล demo เดิมยังอยู่ในเบราว์เซอร์ และไม่ได้อัปโหลดหรือรวมเข้ากับบัญชี</p>:<>{problem&&<p role="alert">{problem}</p>}{query.auth==='error'&&<p role="alert">ยืนยันอีเมลไม่สำเร็จ ลิงก์อาจหมดอายุ กรุณาเข้าสู่ระบบหรือตรวจอีเมลใหม่</p>}<AccountForms email={email} characterName={name}/></>}

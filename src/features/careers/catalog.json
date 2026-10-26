@@ -1,35 +1,231 @@
 [
   {
-    "id": "game_developer",
+    "id": "ai_engineer",
     "category": "career",
-    "title": "นักพัฒนาเกม",
-    "englishTitle": "Game Developer",
-    "description": "เรียนรู้การเขียนโปรแกรม เอนจินเกม และสร้างเกมของตัวเอง",
+    "track": "ai",
+    "title": "วิศวกร AI",
+    "englishTitle": "AI Engineer",
+    "description": "สร้างแอปที่ใช้โมเดล AI และ LLM ตั้งแต่ต่อ API จนถึงระบบถามตอบจากเอกสาร",
     "tasks": [
       {
-        "id": "learn_cpp",
-        "title": "เรียนรู้ C++",
-        "description": "เรียนแนวคิดและฝึกเขียนโปรแกรมด้วยภาษา C++"
+        "id": "python_for_ai",
+        "title": "ฝึก Python สำหรับงาน AI",
+        "description": "เขียน Python จัดการข้อมูล ฟังก์ชัน และไลบรารีที่ใช้บ่อยในงาน AI"
       },
       {
-        "id": "practice_unreal",
-        "title": "ฝึกใช้ Unreal Engine",
-        "description": "ทดลองเครื่องมือและสร้างระบบขนาดเล็กใน Unreal Engine"
+        "id": "call_llm_api",
+        "title": "เรียกใช้ LLM API",
+        "description": "ส่งข้อความไปยังโมเดลภาษาผ่าน API แล้วนำคำตอบมาแสดงผล"
       },
       {
-        "id": "practice_3d_modeling",
-        "title": "ฝึกสร้างโมเดล 3 มิติ",
-        "description": "ฝึกปั้นหรือสร้างวัตถุ 3 มิติสำหรับใช้ในเกม"
+        "id": "prompt_design",
+        "title": "ออกแบบและทดสอบ prompt",
+        "description": "เขียน prompt หลายแบบ เทียบผลลัพธ์ และจดว่าแบบไหนได้ผลดีที่สุด"
       },
       {
-        "id": "programming_challenge",
-        "title": "โจทย์ท้าทายการเขียนโปรแกรม",
-        "description": "แก้โจทย์เขียนโปรแกรมเพื่อฝึกคิดเป็นระบบ"
+        "id": "build_rag",
+        "title": "สร้างระบบถามตอบจากเอกสาร",
+        "description": "ทำ RAG ด้วย embedding และการค้นหาเอกสารมาประกอบคำตอบ"
       },
       {
-        "id": "mini_game_project",
-        "title": "โปรเจกต์มินิเกม",
-        "description": "สร้างมินิเกมหนึ่งส่วนให้เล่นหรือทดสอบได้จริง"
+        "id": "ai_mini_app",
+        "title": "โปรเจกต์แอป AI ขนาดเล็ก",
+        "description": "สร้างแอปที่ใช้ AI แก้ปัญหาจริงหนึ่งอย่างให้คนอื่นลองใช้ได้"
+      }
+    ]
+  },
+  {
+    "id": "ml_engineer",
+    "category": "career",
+    "track": "ai",
+    "title": "วิศวกร Machine Learning",
+    "englishTitle": "Machine Learning Engineer",
+    "description": "เทรน ปรับแต่ง และนำโมเดล Machine Learning ไปใช้งานจริง",
+    "tasks": [
+      {
+        "id": "ml_math",
+        "title": "ทบทวนคณิตศาสตร์สำหรับ ML",
+        "description": "ฝึกเวกเตอร์ เมทริกซ์ ความน่าจะเป็น และอนุพันธ์ที่ใช้ใน ML"
+      },
+      {
+        "id": "train_sklearn",
+        "title": "เทรนโมเดลด้วย scikit-learn",
+        "description": "แบ่งข้อมูล train/test แล้วเทรนโมเดลจำแนกหรือทำนายค่า"
+      },
+      {
+        "id": "pytorch_basics",
+        "title": "ฝึก Deep Learning ด้วย PyTorch",
+        "description": "สร้างโครงข่ายประสาทเทียมเล็ก ๆ และเทรนบนชุดข้อมูลตัวอย่าง"
+      },
+      {
+        "id": "evaluate_model",
+        "title": "วัดผลและปรับโมเดล",
+        "description": "ใช้ accuracy, precision, recall และลองปรับ hyperparameter"
+      },
+      {
+        "id": "deploy_model",
+        "title": "นำโมเดลขึ้นใช้งาน",
+        "description": "ทำ API ให้โมเดลรับข้อมูลและตอบผลทำนายได้"
+      }
+    ]
+  },
+  {
+    "id": "data_scientist",
+    "category": "career",
+    "track": "ai",
+    "title": "นักวิทยาศาสตร์ข้อมูล",
+    "englishTitle": "Data Scientist",
+    "description": "วิเคราะห์ข้อมูล หาข้อมูลเชิงลึก และสร้างโมเดลช่วยตัดสินใจ",
+    "tasks": [
+      {
+        "id": "practice_pandas",
+        "title": "ฝึก pandas",
+        "description": "โหลด ทำความสะอาด และสรุปข้อมูลตารางด้วย pandas"
+      },
+      {
+        "id": "practice_sql",
+        "title": "ฝึก SQL",
+        "description": "เขียน query ดึง กรอง รวม และ join ข้อมูลจากฐานข้อมูล"
+      },
+      {
+        "id": "visualize_data",
+        "title": "สร้างกราฟจากข้อมูล",
+        "description": "ใช้ matplotlib หรือเครื่องมืออื่นทำกราฟที่เล่าเรื่องได้ชัด"
+      },
+      {
+        "id": "statistics_practice",
+        "title": "ฝึกสถิติ",
+        "description": "คำนวณค่าเฉลี่ย การกระจาย และทดสอบสมมติฐานกับข้อมูลจริง"
+      },
+      {
+        "id": "data_story_project",
+        "title": "โปรเจกต์วิเคราะห์ข้อมูล",
+        "description": "เลือกชุดข้อมูลจริงหนึ่งชุด วิเคราะห์ แล้วสรุปผลเป็นรายงานสั้น"
+      }
+    ]
+  },
+  {
+    "id": "data_engineer",
+    "category": "career",
+    "track": "ai",
+    "title": "วิศวกรข้อมูล",
+    "englishTitle": "Data Engineer",
+    "description": "ออกแบบท่อส่งข้อมูลและคลังข้อมูลให้ทีม AI และนักวิเคราะห์ใช้งานได้",
+    "tasks": [
+      {
+        "id": "practice_sql",
+        "title": "ฝึก SQL ขั้นสูง",
+        "description": "ฝึก window function, CTE และการออกแบบตาราง"
+      },
+      {
+        "id": "build_etl",
+        "title": "สร้าง ETL pipeline",
+        "description": "ดึงข้อมูลจากแหล่งหนึ่ง แปลงรูปแบบ แล้วโหลดเข้าฐานข้อมูล"
+      },
+      {
+        "id": "data_warehouse",
+        "title": "ศึกษาคลังข้อมูล",
+        "description": "เรียนรู้ star schema และเครื่องมืออย่าง BigQuery หรือ DuckDB"
+      },
+      {
+        "id": "schedule_pipeline",
+        "title": "ตั้งเวลารันงานอัตโนมัติ",
+        "description": "ใช้ cron หรือ Airflow ให้ pipeline ทำงานตามเวลา"
+      },
+      {
+        "id": "pipeline_project",
+        "title": "โปรเจกต์ท่อข้อมูล",
+        "description": "สร้างระบบเก็บข้อมูลจาก API จริงทุกวันแล้วทำ dashboard"
+      }
+    ]
+  },
+  {
+    "id": "computer_vision_engineer",
+    "category": "career",
+    "track": "ai",
+    "title": "วิศวกร Computer Vision",
+    "englishTitle": "Computer Vision Engineer",
+    "description": "สอนคอมพิวเตอร์ให้มองเห็น จำแนกภาพ และตรวจจับวัตถุ",
+    "tasks": [
+      {
+        "id": "opencv_basics",
+        "title": "ฝึก OpenCV",
+        "description": "อ่านภาพ ปรับสี ตัดภาพ และหาขอบวัตถุด้วย OpenCV"
+      },
+      {
+        "id": "image_classifier",
+        "title": "สร้างตัวจำแนกภาพ",
+        "description": "เทรนโมเดลแยกประเภทภาพจากชุดข้อมูลตัวอย่าง"
+      },
+      {
+        "id": "object_detection",
+        "title": "ตรวจจับวัตถุ",
+        "description": "ลองใช้โมเดลอย่าง YOLO ตรวจจับวัตถุในภาพหรือวิดีโอ"
+      },
+      {
+        "id": "cv_project",
+        "title": "โปรเจกต์ Computer Vision",
+        "description": "สร้างแอปที่ใช้กล้องหรือภาพแก้ปัญหาจริงหนึ่งอย่าง"
+      }
+    ]
+  },
+  {
+    "id": "ai_researcher",
+    "category": "career",
+    "track": "ai",
+    "title": "นักวิจัย AI",
+    "englishTitle": "AI Researcher",
+    "description": "อ่านงานวิจัย ทดลองไอเดียใหม่ และผลักดันขีดความสามารถของ AI",
+    "tasks": [
+      {
+        "id": "read_paper",
+        "title": "อ่านงานวิจัย AI",
+        "description": "อ่าน paper หนึ่งเรื่องและสรุปปัญหา วิธีการ และผลลัพธ์"
+      },
+      {
+        "id": "reproduce_result",
+        "title": "ทำซ้ำผลการทดลอง",
+        "description": "ลองรันโค้ดหรือเขียนใหม่ให้ได้ผลใกล้เคียงกับใน paper"
+      },
+      {
+        "id": "design_experiment",
+        "title": "ออกแบบการทดลอง",
+        "description": "ตั้งสมมติฐาน กำหนดตัวแปร และวิธีวัดผลการทดลอง"
+      },
+      {
+        "id": "write_report",
+        "title": "เขียนรายงานผลวิจัย",
+        "description": "สรุปการทดลองของตัวเองเป็นรายงานพร้อมกราฟ"
+      }
+    ]
+  },
+  {
+    "id": "robotics_engineer",
+    "category": "career",
+    "track": "ai",
+    "title": "วิศวกรหุ่นยนต์",
+    "englishTitle": "Robotics Engineer",
+    "description": "ผสาน AI ฮาร์ดแวร์ และเซนเซอร์ให้หุ่นยนต์รับรู้และเคลื่อนไหวได้",
+    "tasks": [
+      {
+        "id": "learn_ros",
+        "title": "ศึกษา ROS",
+        "description": "เรียนรู้ node, topic และการสื่อสารใน Robot Operating System"
+      },
+      {
+        "id": "sensor_practice",
+        "title": "ฝึกอ่านค่าเซนเซอร์",
+        "description": "ต่อเซนเซอร์กับบอร์ดแล้วอ่านค่ามาประมวลผล"
+      },
+      {
+        "id": "robot_simulation",
+        "title": "จำลองหุ่นยนต์",
+        "description": "ทดลองควบคุมหุ่นยนต์ในโปรแกรมจำลองอย่าง Gazebo หรือ Webots"
+      },
+      {
+        "id": "robot_project",
+        "title": "โปรเจกต์หุ่นยนต์เล็ก",
+        "description": "สร้างหุ่นยนต์หรือระบบอัตโนมัติที่ทำงานได้หนึ่งอย่าง"
       }
     ]
   },
@@ -65,6 +261,292 @@
         "title": "สร้างมินิแอป",
         "description": "สร้างแอปขนาดเล็กที่เปิดใช้งานและทดลองได้"
       }
+    ],
+    "track": "dev"
+  },
+  {
+    "id": "frontend_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาฝั่งหน้าบ้าน",
+    "englishTitle": "Frontend Developer",
+    "description": "สร้างหน้าเว็บที่สวย ใช้งานง่าย และตอบสนองเร็วด้วย HTML CSS และ JavaScript",
+    "tasks": [
+      {
+        "id": "html_css",
+        "title": "ฝึก HTML และ CSS",
+        "description": "สร้างหน้าเว็บและจัดเลย์เอาต์ด้วย Flexbox และ Grid"
+      },
+      {
+        "id": "javascript_dom",
+        "title": "ฝึก JavaScript กับ DOM",
+        "description": "ทำให้หน้าเว็บโต้ตอบได้ด้วยการจัดการ event และ DOM"
+      },
+      {
+        "id": "learn_react",
+        "title": "เรียน React",
+        "description": "สร้าง component, state และ props ใน React"
+      },
+      {
+        "id": "responsive_design",
+        "title": "ทำเว็บรองรับมือถือ",
+        "description": "ปรับหน้าเว็บให้ใช้งานได้ดีทั้งบนจอใหญ่และมือถือ"
+      },
+      {
+        "id": "frontend_project",
+        "title": "โปรเจกต์เว็บหน้าบ้าน",
+        "description": "สร้างเว็บหนึ่งหน้าที่ใช้งานได้จริงและนำขึ้นออนไลน์"
+      }
+    ]
+  },
+  {
+    "id": "backend_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาฝั่งหลังบ้าน",
+    "englishTitle": "Backend Developer",
+    "description": "สร้าง API ฐานข้อมูล และระบบหลังบ้านที่เสถียรและปลอดภัย",
+    "tasks": [
+      {
+        "id": "build_rest_api",
+        "title": "สร้าง REST API",
+        "description": "เขียน API รับและส่งข้อมูลด้วย Node.js, Python หรือ Go"
+      },
+      {
+        "id": "database_design",
+        "title": "ออกแบบฐานข้อมูล",
+        "description": "ออกแบบตารางและความสัมพันธ์ของข้อมูล"
+      },
+      {
+        "id": "auth_practice",
+        "title": "ทำระบบยืนยันตัวตน",
+        "description": "ทำระบบสมัครสมาชิก เข้าสู่ระบบ และตรวจสิทธิ์"
+      },
+      {
+        "id": "write_tests",
+        "title": "เขียนเทสต์",
+        "description": "เขียน unit test และ integration test ให้ API"
+      },
+      {
+        "id": "backend_project",
+        "title": "โปรเจกต์ระบบหลังบ้าน",
+        "description": "สร้าง API ครบวงจรพร้อมฐานข้อมูลและนำขึ้นเซิร์ฟเวอร์"
+      }
+    ]
+  },
+  {
+    "id": "fullstack_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาฟูลสแตก",
+    "englishTitle": "Full-Stack Developer",
+    "description": "ทำได้ทั้งหน้าบ้านและหลังบ้าน สร้างเว็บแอปครบวงจรด้วยตัวเอง",
+    "tasks": [
+      {
+        "id": "learn_framework",
+        "title": "เรียนเฟรมเวิร์กฟูลสแตก",
+        "description": "ฝึก Next.js หรือเฟรมเวิร์กที่ทำได้ทั้งหน้าบ้านและหลังบ้าน"
+      },
+      {
+        "id": "connect_database",
+        "title": "เชื่อมเว็บกับฐานข้อมูล",
+        "description": "ให้หน้าเว็บอ่านและบันทึกข้อมูลลงฐานข้อมูลจริง"
+      },
+      {
+        "id": "deploy_webapp",
+        "title": "นำเว็บแอปขึ้นออนไลน์",
+        "description": "deploy เว็บแอปขึ้น Vercel, Render หรือคลาวด์อื่น"
+      },
+      {
+        "id": "fullstack_project",
+        "title": "โปรเจกต์เว็บแอปฟูลสแตก",
+        "description": "สร้างเว็บแอปที่มีผู้ใช้ ข้อมูล และฟีเจอร์หลักครบ"
+      }
+    ]
+  },
+  {
+    "id": "mobile_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาแอปมือถือ",
+    "englishTitle": "Mobile App Developer",
+    "description": "สร้างแอป iOS และ Android ด้วย Flutter, React Native, Swift หรือ Kotlin",
+    "tasks": [
+      {
+        "id": "mobile_ui",
+        "title": "สร้างหน้าจอแอป",
+        "description": "ออกแบบและเขียนหน้าจอแอปพร้อมการนำทางระหว่างหน้า"
+      },
+      {
+        "id": "mobile_state",
+        "title": "จัดการข้อมูลในแอป",
+        "description": "เก็บสถานะและข้อมูลของผู้ใช้ให้แอปทำงานถูกต้อง"
+      },
+      {
+        "id": "mobile_api",
+        "title": "เชื่อมแอปกับ API",
+        "description": "ดึงข้อมูลจากอินเทอร์เน็ตมาแสดงในแอป"
+      },
+      {
+        "id": "mobile_project",
+        "title": "โปรเจกต์แอปมือถือ",
+        "description": "สร้างแอปเล็ก ๆ ที่ติดตั้งลงมือถือและใช้งานได้จริง"
+      }
+    ]
+  },
+  {
+    "id": "devops_engineer",
+    "category": "career",
+    "track": "dev",
+    "title": "วิศวกร DevOps และคลาวด์",
+    "englishTitle": "DevOps & Cloud Engineer",
+    "description": "ดูแลการ deploy เซิร์ฟเวอร์ และระบบคลาวด์ให้ซอฟต์แวร์ทำงานได้ตลอดเวลา",
+    "tasks": [
+      {
+        "id": "linux_basics",
+        "title": "ฝึกใช้ Linux",
+        "description": "ใช้คำสั่ง terminal จัดการไฟล์ สิทธิ์ และโปรเซส"
+      },
+      {
+        "id": "docker_practice",
+        "title": "ฝึก Docker",
+        "description": "สร้าง image และรันแอปใน container"
+      },
+      {
+        "id": "ci_cd",
+        "title": "ทำ CI/CD",
+        "description": "ตั้งค่า GitHub Actions ให้เทสต์และ deploy อัตโนมัติ"
+      },
+      {
+        "id": "cloud_basics",
+        "title": "เรียนคลาวด์",
+        "description": "ทดลองบริการพื้นฐานของ AWS, GCP หรือ Azure"
+      },
+      {
+        "id": "devops_project",
+        "title": "โปรเจกต์ DevOps",
+        "description": "นำแอปขึ้นคลาวด์พร้อมระบบ deploy อัตโนมัติและการเฝ้าระวัง"
+      }
+    ]
+  },
+  {
+    "id": "cybersecurity_specialist",
+    "category": "career",
+    "track": "dev",
+    "title": "ผู้เชี่ยวชาญความปลอดภัยไซเบอร์",
+    "englishTitle": "Cybersecurity Specialist",
+    "description": "ปกป้องระบบและข้อมูลจากการโจมตี ฝึกคิดแบบแฮกเกอร์สายขาว",
+    "tasks": [
+      {
+        "id": "network_basics",
+        "title": "เรียนพื้นฐานเครือข่าย",
+        "description": "ทำความเข้าใจ TCP/IP, DNS และ HTTP"
+      },
+      {
+        "id": "web_security",
+        "title": "ศึกษาช่องโหว่เว็บ",
+        "description": "เรียนรู้ OWASP Top 10 และวิธีป้องกัน"
+      },
+      {
+        "id": "ctf_practice",
+        "title": "ฝึกโจทย์ CTF",
+        "description": "แก้โจทย์ Capture The Flag บนแพลตฟอร์มฝึกอย่าง TryHackMe"
+      },
+      {
+        "id": "secure_code_review",
+        "title": "ตรวจโค้ดหาช่องโหว่",
+        "description": "อ่านโค้ดของตัวเองแล้วหาจุดที่อาจถูกโจมตี"
+      }
+    ]
+  },
+  {
+    "id": "qa_engineer",
+    "category": "career",
+    "track": "dev",
+    "title": "วิศวกรทดสอบซอฟต์แวร์",
+    "englishTitle": "QA / Test Engineer",
+    "description": "ตรวจหาบั๊กและสร้างระบบทดสอบอัตโนมัติให้ซอฟต์แวร์มีคุณภาพ",
+    "tasks": [
+      {
+        "id": "write_test_cases",
+        "title": "เขียน test case",
+        "description": "ออกแบบกรณีทดสอบทั้งกรณีปกติและกรณีขอบ"
+      },
+      {
+        "id": "automation_testing",
+        "title": "ทดสอบอัตโนมัติ",
+        "description": "ใช้ Playwright หรือ Selenium ทดสอบเว็บอัตโนมัติ"
+      },
+      {
+        "id": "bug_report",
+        "title": "เขียนรายงานบั๊ก",
+        "description": "รายงานบั๊กให้ชัดว่าทำซ้ำอย่างไร ผลที่ได้ และผลที่ควรได้"
+      },
+      {
+        "id": "qa_project",
+        "title": "โปรเจกต์ชุดทดสอบ",
+        "description": "สร้างชุดทดสอบอัตโนมัติให้แอปหนึ่งตัว"
+      }
+    ]
+  },
+  {
+    "id": "embedded_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาระบบฝังตัวและ IoT",
+    "englishTitle": "Embedded & IoT Developer",
+    "description": "เขียนโปรแกรมควบคุมบอร์ดและอุปกรณ์ เชื่อมของจริงเข้ากับอินเทอร์เน็ต",
+    "tasks": [
+      {
+        "id": "arduino_basics",
+        "title": "ฝึก Arduino หรือ ESP32",
+        "description": "เขียนโปรแกรมควบคุมไฟ ปุ่ม และมอเตอร์"
+      },
+      {
+        "id": "c_for_embedded",
+        "title": "ฝึกภาษา C สำหรับบอร์ด",
+        "description": "เขียน C จัดการหน่วยความจำและขาสัญญาณ"
+      },
+      {
+        "id": "iot_connect",
+        "title": "ส่งข้อมูลขึ้นอินเทอร์เน็ต",
+        "description": "ให้บอร์ดส่งค่าเซนเซอร์ขึ้นเซิร์ฟเวอร์หรือแดชบอร์ด"
+      },
+      {
+        "id": "iot_project",
+        "title": "โปรเจกต์ IoT",
+        "description": "สร้างอุปกรณ์อัจฉริยะที่ใช้งานได้จริงหนึ่งชิ้น"
+      }
+    ]
+  },
+  {
+    "id": "blockchain_developer",
+    "category": "career",
+    "track": "dev",
+    "title": "นักพัฒนาบล็อกเชน",
+    "englishTitle": "Blockchain Developer",
+    "description": "เขียน smart contract และแอปกระจายศูนย์บนบล็อกเชน",
+    "tasks": [
+      {
+        "id": "blockchain_concepts",
+        "title": "เรียนแนวคิดบล็อกเชน",
+        "description": "ทำความเข้าใจบล็อก ธุรกรรม และกลไกฉันทามติ"
+      },
+      {
+        "id": "solidity_basics",
+        "title": "ฝึก Solidity",
+        "description": "เขียน smart contract อย่างง่ายบน testnet"
+      },
+      {
+        "id": "contract_security",
+        "title": "ศึกษาความปลอดภัย smart contract",
+        "description": "เรียนรู้ช่องโหว่ที่พบบ่อยและวิธีป้องกัน"
+      },
+      {
+        "id": "dapp_project",
+        "title": "โปรเจกต์ dApp",
+        "description": "สร้างเว็บที่เชื่อมกับ smart contract ของตัวเอง"
+      }
     ]
   },
   {
@@ -98,6 +580,772 @@
         "id": "mini_design_project",
         "title": "มินิโปรเจกต์ออกแบบ",
         "description": "สร้างผลงานออกแบบขนาดเล็กตั้งแต่แนวคิดถึงต้นแบบ"
+      }
+    ],
+    "track": "dev"
+  },
+  {
+    "id": "game_developer",
+    "category": "career",
+    "title": "นักพัฒนาเกม",
+    "englishTitle": "Game Developer",
+    "description": "เรียนรู้การเขียนโปรแกรม เอนจินเกม และสร้างเกมของตัวเอง",
+    "tasks": [
+      {
+        "id": "learn_cpp",
+        "title": "เรียนรู้ C++",
+        "description": "เรียนแนวคิดและฝึกเขียนโปรแกรมด้วยภาษา C++"
+      },
+      {
+        "id": "practice_unreal",
+        "title": "ฝึกใช้ Unreal Engine",
+        "description": "ทดลองเครื่องมือและสร้างระบบขนาดเล็กใน Unreal Engine"
+      },
+      {
+        "id": "practice_3d_modeling",
+        "title": "ฝึกสร้างโมเดล 3 มิติ",
+        "description": "ฝึกปั้นหรือสร้างวัตถุ 3 มิติสำหรับใช้ในเกม"
+      },
+      {
+        "id": "programming_challenge",
+        "title": "โจทย์ท้าทายการเขียนโปรแกรม",
+        "description": "แก้โจทย์เขียนโปรแกรมเพื่อฝึกคิดเป็นระบบ"
+      },
+      {
+        "id": "mini_game_project",
+        "title": "โปรเจกต์มินิเกม",
+        "description": "สร้างมินิเกมหนึ่งส่วนให้เล่นหรือทดสอบได้จริง"
+      }
+    ],
+    "track": "game"
+  },
+  {
+    "id": "game_designer",
+    "category": "career",
+    "track": "game",
+    "title": "นักออกแบบเกม",
+    "englishTitle": "Game Designer",
+    "description": "ออกแบบกติกา ระบบ และประสบการณ์ที่ทำให้เกมสนุก",
+    "tasks": [
+      {
+        "id": "analyze_games",
+        "title": "วิเคราะห์เกมที่ชอบ",
+        "description": "เล่นเกมแล้วจดว่ากลไกไหนทำให้สนุกและเพราะอะไร"
+      },
+      {
+        "id": "paper_prototype",
+        "title": "ทำต้นแบบบนกระดาษ",
+        "description": "ออกแบบเกมกระดานหรือการ์ดเพื่อทดสอบกติกาเร็ว ๆ"
+      },
+      {
+        "id": "write_gdd",
+        "title": "เขียนเอกสารออกแบบเกม",
+        "description": "เขียน Game Design Document บอกแนวคิด กติกา และเป้าหมาย"
+      },
+      {
+        "id": "balance_tuning",
+        "title": "ปรับสมดุลเกม",
+        "description": "ปรับค่าตัวเลขของเกมให้ไม่ง่ายหรือยากเกินไป"
+      },
+      {
+        "id": "playtest_session",
+        "title": "จัดเพลย์เทสต์",
+        "description": "ให้คนอื่นลองเล่นแล้วสังเกตและจดฟีดแบ็ก"
+      }
+    ]
+  },
+  {
+    "id": "game_artist_3d",
+    "category": "career",
+    "track": "game",
+    "title": "ศิลปินเกม 3 มิติ",
+    "englishTitle": "3D Game Artist",
+    "description": "ปั้นตัวละคร ฉาก และพร็อพ 3 มิติที่พร้อมใช้ในเกม",
+    "tasks": [
+      {
+        "id": "blender_modeling",
+        "title": "ฝึกโมเดลด้วย Blender",
+        "description": "ปั้นวัตถุ 3 มิติจากรูปทรงพื้นฐาน"
+      },
+      {
+        "id": "uv_texturing",
+        "title": "ฝึก UV และเท็กซ์เจอร์",
+        "description": "คลี่ UV และลงสีพื้นผิวให้โมเดล"
+      },
+      {
+        "id": "low_poly_asset",
+        "title": "สร้างโมเดล low-poly",
+        "description": "ทำโมเดลที่จำนวนโพลีกอนเหมาะกับเกม"
+      },
+      {
+        "id": "export_to_engine",
+        "title": "นำโมเดลเข้าเอนจิน",
+        "description": "export โมเดลเข้า Unity, Unreal หรือ Godot แล้วตรวจผล"
+      }
+    ]
+  },
+  {
+    "id": "game_artist_2d",
+    "category": "career",
+    "track": "game",
+    "title": "ศิลปินเกม 2 มิติและพิกเซลอาร์ต",
+    "englishTitle": "2D Game Artist",
+    "description": "วาดตัวละคร ฉาก และแอนิเมชัน 2 มิติหรือพิกเซลอาร์ตสำหรับเกม",
+    "tasks": [
+      {
+        "id": "pixel_art_basics",
+        "title": "ฝึกพิกเซลอาร์ต",
+        "description": "วาดตัวละครหรือไอเทมขนาดเล็กด้วย Aseprite หรือโปรแกรมอื่น"
+      },
+      {
+        "id": "sprite_animation",
+        "title": "ทำแอนิเมชันสไปรต์",
+        "description": "ทำท่าเดิน วิ่ง หรือโจมตีเป็นเฟรม"
+      },
+      {
+        "id": "tileset_design",
+        "title": "ออกแบบ tileset",
+        "description": "วาดชุดพื้นและฉากที่ต่อกันได้ไม่สะดุด"
+      },
+      {
+        "id": "game_ui_art",
+        "title": "วาด UI เกม",
+        "description": "ออกแบบปุ่ม แถบเลือด และไอคอนให้เข้ากับธีมเกม"
+      }
+    ]
+  },
+  {
+    "id": "technical_artist",
+    "category": "career",
+    "track": "game",
+    "title": "เทคนิคอลอาร์ทิสต์",
+    "englishTitle": "Technical Artist",
+    "description": "เชื่อมงานศิลป์กับโปรแกรมมิ่ง ทั้ง shader เอฟเฟกต์ และเครื่องมือช่วยทีม",
+    "tasks": [
+      {
+        "id": "shader_basics",
+        "title": "ฝึกเขียน shader",
+        "description": "ทดลอง shader graph หรือเขียน shader ง่าย ๆ"
+      },
+      {
+        "id": "vfx_practice",
+        "title": "ทำเอฟเฟกต์ภาพ",
+        "description": "สร้างเอฟเฟกต์ไฟ ระเบิด หรือเวทมนตร์ด้วยระบบอนุภาค"
+      },
+      {
+        "id": "optimize_assets",
+        "title": "ปรับประสิทธิภาพงานภาพ",
+        "description": "ลดภาระการเรนเดอร์โดยภาพยังสวยอยู่"
+      },
+      {
+        "id": "tool_script",
+        "title": "เขียนสคริปต์ช่วยงาน",
+        "description": "เขียนเครื่องมือเล็ก ๆ ใน Blender หรือเอนจินเพื่อลดงานซ้ำ"
+      }
+    ]
+  },
+  {
+    "id": "level_designer",
+    "category": "career",
+    "track": "game",
+    "title": "นักออกแบบด่าน",
+    "englishTitle": "Level Designer",
+    "description": "สร้างด่านและแผนที่ที่นำทางผู้เล่น สร้างความท้าทาย และเล่าเรื่องผ่านพื้นที่",
+    "tasks": [
+      {
+        "id": "level_sketch",
+        "title": "ร่างแผนผังด่าน",
+        "description": "วาดแผนผังด่านบนกระดาษพร้อมเส้นทางและจุดสำคัญ"
+      },
+      {
+        "id": "blockout_level",
+        "title": "ทำ blockout ด่าน",
+        "description": "สร้างด่านด้วยกล่องในเอนจินเพื่อทดสอบการเล่น"
+      },
+      {
+        "id": "pacing_practice",
+        "title": "ฝึกจังหวะของด่าน",
+        "description": "จัดช่วงตื่นเต้นและช่วงพักให้สมดุล"
+      },
+      {
+        "id": "level_playtest",
+        "title": "ทดสอบด่าน",
+        "description": "ให้คนอื่นเล่นแล้วดูว่าหลงทางหรือติดตรงไหน"
+      }
+    ]
+  },
+  {
+    "id": "game_audio_designer",
+    "category": "career",
+    "track": "game",
+    "title": "นักออกแบบเสียงเกม",
+    "englishTitle": "Game Audio Designer",
+    "description": "สร้างเพลงและเสียงประกอบที่ทำให้เกมมีชีวิต",
+    "tasks": [
+      {
+        "id": "sfx_recording",
+        "title": "สร้างเสียงประกอบ",
+        "description": "บันทึกหรือสังเคราะห์เสียงกระโดด เก็บของ และโจมตี"
+      },
+      {
+        "id": "game_music",
+        "title": "แต่งเพลงเกม",
+        "description": "แต่งเพลงสั้นที่วนซ้ำได้สำหรับฉากหนึ่ง"
+      },
+      {
+        "id": "audio_middleware",
+        "title": "ฝึก FMOD หรือ Wwise",
+        "description": "ตั้งค่าเสียงให้เปลี่ยนตามสถานการณ์ในเกม"
+      },
+      {
+        "id": "audio_in_engine",
+        "title": "ใส่เสียงในเอนจิน",
+        "description": "นำเสียงเข้าเกมและปรับระดับเสียงให้สมดุล"
+      }
+    ]
+  },
+  {
+    "id": "xr_developer",
+    "category": "career",
+    "track": "game",
+    "title": "นักพัฒนา VR/AR",
+    "englishTitle": "XR (VR/AR) Developer",
+    "description": "สร้างเกมและประสบการณ์เสมือนจริงสำหรับแว่น VR และ AR",
+    "tasks": [
+      {
+        "id": "xr_setup",
+        "title": "ตั้งค่าโปรเจกต์ XR",
+        "description": "เตรียมเอนจินและ SDK สำหรับ VR หรือ AR"
+      },
+      {
+        "id": "xr_interaction",
+        "title": "ทำระบบหยิบจับ",
+        "description": "ให้ผู้เล่นหยิบ ขว้าง และกดปุ่มในโลกเสมือนได้"
+      },
+      {
+        "id": "xr_comfort",
+        "title": "ออกแบบให้ไม่เวียนหัว",
+        "description": "ทดลองวิธีเคลื่อนที่ที่ผู้เล่นสบายตา"
+      },
+      {
+        "id": "xr_project",
+        "title": "โปรเจกต์ XR",
+        "description": "สร้างฉาก VR หรือ AR สั้น ๆ ที่ใช้งานได้จริง"
+      }
+    ]
+  },
+  {
+    "id": "python",
+    "category": "skill",
+    "track": "ai",
+    "title": "ภาษา Python",
+    "englishTitle": "Python",
+    "description": "ภาษายอดนิยมของงาน AI ข้อมูล และระบบอัตโนมัติ",
+    "tasks": [
+      {
+        "id": "python_syntax",
+        "title": "ฝึกพื้นฐาน Python",
+        "description": "ตัวแปร เงื่อนไข ลูป และฟังก์ชันใน Python"
+      },
+      {
+        "id": "python_collections",
+        "title": "ฝึก list และ dict",
+        "description": "จัดเก็บและประมวลผลข้อมูลด้วยโครงสร้างข้อมูล"
+      },
+      {
+        "id": "python_files",
+        "title": "อ่านเขียนไฟล์",
+        "description": "อ่านไฟล์ CSV หรือ JSON แล้วประมวลผล"
+      },
+      {
+        "id": "python_script",
+        "title": "เขียนสคริปต์อัตโนมัติ",
+        "description": "เขียนสคริปต์ช่วยงานซ้ำ ๆ ในชีวิตประจำวัน"
+      }
+    ]
+  },
+  {
+    "id": "prompt_engineering",
+    "category": "skill",
+    "track": "ai",
+    "title": "การเขียน Prompt",
+    "englishTitle": "Prompt Engineering",
+    "description": "สั่งงาน AI ให้ได้ผลแม่นยำ ใช้ AI ช่วยเรียนและทำงาน",
+    "tasks": [
+      {
+        "id": "clear_instructions",
+        "title": "เขียนคำสั่งให้ชัด",
+        "description": "ระบุบทบาท เป้าหมาย และรูปแบบคำตอบที่ต้องการ"
+      },
+      {
+        "id": "few_shot",
+        "title": "ใช้ตัวอย่างนำทาง",
+        "description": "ใส่ตัวอย่างใน prompt เพื่อให้ AI ทำตามรูปแบบ"
+      },
+      {
+        "id": "compare_outputs",
+        "title": "เปรียบเทียบผลลัพธ์",
+        "description": "ลอง prompt หลายแบบกับงานเดียวกันแล้วเลือกแบบที่ดีที่สุด"
+      },
+      {
+        "id": "ai_workflow",
+        "title": "สร้างขั้นตอนทำงานกับ AI",
+        "description": "ใช้ AI ช่วยงานจริงหนึ่งอย่างตั้งแต่ต้นจนจบ"
+      }
+    ]
+  },
+  {
+    "id": "machine_learning",
+    "category": "skill",
+    "track": "ai",
+    "title": "พื้นฐาน Machine Learning",
+    "englishTitle": "Machine Learning Basics",
+    "description": "เข้าใจว่าเครื่องเรียนรู้จากข้อมูลอย่างไร และสร้างโมเดลแรก",
+    "tasks": [
+      {
+        "id": "ml_concepts",
+        "title": "เรียนแนวคิด ML",
+        "description": "supervised, unsupervised, overfitting และการแบ่งข้อมูล"
+      },
+      {
+        "id": "first_model",
+        "title": "สร้างโมเดลแรก",
+        "description": "เทรนโมเดลทำนายค่าจากชุดข้อมูลง่าย ๆ"
+      },
+      {
+        "id": "feature_engineering",
+        "title": "ฝึกเตรียมข้อมูล",
+        "description": "ทำความสะอาดข้อมูลและสร้าง feature ใหม่"
+      },
+      {
+        "id": "kaggle_practice",
+        "title": "ฝึกบน Kaggle",
+        "description": "ลองโจทย์ระดับเริ่มต้นบน Kaggle"
+      }
+    ]
+  },
+  {
+    "id": "math_for_ai",
+    "category": "skill",
+    "track": "ai",
+    "title": "คณิตศาสตร์สำหรับ AI",
+    "englishTitle": "Math for AI",
+    "description": "พีชคณิตเชิงเส้น แคลคูลัส และสถิติที่อยู่เบื้องหลัง AI",
+    "tasks": [
+      {
+        "id": "linear_algebra",
+        "title": "ฝึกพีชคณิตเชิงเส้น",
+        "description": "เวกเตอร์ เมทริกซ์ และการคูณเมทริกซ์"
+      },
+      {
+        "id": "calculus_practice",
+        "title": "ฝึกแคลคูลัส",
+        "description": "อนุพันธ์และ gradient descent"
+      },
+      {
+        "id": "probability_practice",
+        "title": "ฝึกความน่าจะเป็น",
+        "description": "ความน่าจะเป็น การแจกแจง และ Bayes"
+      },
+      {
+        "id": "math_in_code",
+        "title": "เขียนคณิตเป็นโค้ด",
+        "description": "ใช้ NumPy คำนวณสิ่งที่เรียนมา"
+      }
+    ]
+  },
+  {
+    "id": "programming",
+    "category": "skill",
+    "track": "dev",
+    "title": "การเขียนโปรแกรม",
+    "englishTitle": "Programming",
+    "description": "ฝึกเขียนโค้ด อ่านเอกสาร และสร้างโปรเจกต์ได้ด้วยตัวเอง",
+    "tasks": [
+      {
+        "id": "study_programming",
+        "title": "ศึกษาการเขียนโปรแกรม",
+        "description": "เรียนแนวคิดใหม่และทดลองเขียนโค้ดตามความเข้าใจ"
+      },
+      {
+        "id": "coding_problems",
+        "title": "แก้โจทย์เขียนโค้ด",
+        "description": "ฝึกแก้โจทย์และอธิบายวิธีคิดของตัวเอง"
+      },
+      {
+        "id": "read_documentation",
+        "title": "อ่านเอกสารประกอบ",
+        "description": "อ่านเอกสารทางการและทดลองใช้สิ่งที่เรียนรู้"
+      },
+      {
+        "id": "build_without_copying",
+        "title": "สร้างบางสิ่งโดยไม่คัดลอก",
+        "description": "สร้างฟีเจอร์หรือโปรแกรมด้วยความเข้าใจของตัวเอง"
+      },
+      {
+        "id": "mini_project",
+        "title": "มินิโปรเจกต์",
+        "description": "สร้างโปรเจกต์ขนาดเล็กที่ใช้งานหรือสาธิตได้"
+      }
+    ]
+  },
+  {
+    "id": "javascript",
+    "category": "skill",
+    "track": "dev",
+    "title": "ภาษา JavaScript",
+    "englishTitle": "JavaScript",
+    "description": "ภาษาของเว็บ ใช้ได้ทั้งหน้าบ้าน หลังบ้าน และแอป",
+    "tasks": [
+      {
+        "id": "js_basics",
+        "title": "ฝึกพื้นฐาน JavaScript",
+        "description": "ตัวแปร ฟังก์ชัน array และ object"
+      },
+      {
+        "id": "js_async",
+        "title": "ฝึก async/await",
+        "description": "เรียก API และจัดการงานที่ต้องรอผล"
+      },
+      {
+        "id": "typescript_basics",
+        "title": "เริ่ม TypeScript",
+        "description": "เพิ่มชนิดข้อมูลให้โค้ดเพื่อลดบั๊ก"
+      },
+      {
+        "id": "js_project",
+        "title": "โปรเจกต์ JavaScript",
+        "description": "สร้างโปรแกรมหรือหน้าเว็บเล็ก ๆ ด้วย JavaScript"
+      }
+    ]
+  },
+  {
+    "id": "algorithms",
+    "category": "skill",
+    "track": "dev",
+    "title": "อัลกอริทึมและโครงสร้างข้อมูล",
+    "englishTitle": "Algorithms & Data Structures",
+    "description": "ฝึกคิดแก้ปัญหาอย่างเป็นระบบ พื้นฐานของนักพัฒนาทุกสาย",
+    "tasks": [
+      {
+        "id": "arrays_strings",
+        "title": "ฝึกโจทย์ array และ string",
+        "description": "แก้โจทย์จัดการข้อมูลเรียงลำดับ"
+      },
+      {
+        "id": "sorting_searching",
+        "title": "ฝึกการเรียงและค้นหา",
+        "description": "เขียน sort และ binary search เอง"
+      },
+      {
+        "id": "trees_graphs",
+        "title": "ฝึก tree และ graph",
+        "description": "ท่อง tree และหาเส้นทางใน graph"
+      },
+      {
+        "id": "leetcode_daily",
+        "title": "ทำโจทย์วันละข้อ",
+        "description": "แก้โจทย์บน LeetCode หรือแพลตฟอร์มอื่นหนึ่งข้อ"
+      }
+    ]
+  },
+  {
+    "id": "git_github",
+    "category": "skill",
+    "track": "dev",
+    "title": "Git และ GitHub",
+    "englishTitle": "Git & GitHub",
+    "description": "จัดการเวอร์ชันโค้ดและทำงานร่วมกับคนอื่น",
+    "tasks": [
+      {
+        "id": "git_commit",
+        "title": "ฝึก commit",
+        "description": "บันทึกงานเป็น commit ที่มีข้อความชัดเจน"
+      },
+      {
+        "id": "git_branch",
+        "title": "ฝึก branch และ merge",
+        "description": "แยก branch ทำฟีเจอร์แล้วรวมกลับ"
+      },
+      {
+        "id": "pull_request",
+        "title": "เปิด Pull Request",
+        "description": "ส่งโค้ดผ่าน PR และอ่านรีวิว"
+      },
+      {
+        "id": "open_source",
+        "title": "ร่วมโปรเจกต์โอเพนซอร์ส",
+        "description": "หา issue ง่าย ๆ ในโปรเจกต์จริงแล้วลองแก้"
+      }
+    ]
+  },
+  {
+    "id": "sql_databases",
+    "category": "skill",
+    "track": "dev",
+    "title": "SQL และฐานข้อมูล",
+    "englishTitle": "SQL & Databases",
+    "description": "เก็บ ค้นหา และจัดการข้อมูลอย่างมีประสิทธิภาพ",
+    "tasks": [
+      {
+        "id": "sql_select",
+        "title": "ฝึก SELECT",
+        "description": "ดึงและกรองข้อมูลด้วย WHERE, ORDER BY"
+      },
+      {
+        "id": "sql_join",
+        "title": "ฝึก JOIN",
+        "description": "รวมข้อมูลจากหลายตาราง"
+      },
+      {
+        "id": "sql_design",
+        "title": "ออกแบบตาราง",
+        "description": "กำหนด primary key, foreign key และ index"
+      },
+      {
+        "id": "sql_project",
+        "title": "โปรเจกต์ฐานข้อมูล",
+        "description": "ออกแบบฐานข้อมูลให้แอปหนึ่งตัวพร้อมข้อมูลตัวอย่าง"
+      }
+    ]
+  },
+  {
+    "id": "linux_command_line",
+    "category": "skill",
+    "track": "dev",
+    "title": "Linux และ Command Line",
+    "englishTitle": "Linux & Command Line",
+    "description": "ใช้ terminal อย่างคล่องแคล่ว ทักษะที่นักพัฒนาทุกคนต้องมี",
+    "tasks": [
+      {
+        "id": "terminal_basics",
+        "title": "ฝึกคำสั่งพื้นฐาน",
+        "description": "cd, ls, cp, mv, rm และการจัดการไฟล์"
+      },
+      {
+        "id": "pipes_grep",
+        "title": "ฝึก pipe และ grep",
+        "description": "ค้นหาและกรองข้อความด้วยคำสั่งต่อกัน"
+      },
+      {
+        "id": "shell_script",
+        "title": "เขียน shell script",
+        "description": "เขียนสคริปต์ทำงานอัตโนมัติ"
+      },
+      {
+        "id": "ssh_server",
+        "title": "เชื่อมต่อเซิร์ฟเวอร์",
+        "description": "ใช้ SSH เข้าเครื่องระยะไกลและจัดการไฟล์"
+      }
+    ]
+  },
+  {
+    "id": "cybersecurity_basics",
+    "category": "skill",
+    "track": "dev",
+    "title": "พื้นฐานความปลอดภัยไซเบอร์",
+    "englishTitle": "Cybersecurity Basics",
+    "description": "รู้ทันภัยออนไลน์และเขียนโค้ดที่ปลอดภัย",
+    "tasks": [
+      {
+        "id": "password_security",
+        "title": "ความปลอดภัยรหัสผ่าน",
+        "description": "เรียนรู้ hashing และการเก็บรหัสผ่านอย่างปลอดภัย"
+      },
+      {
+        "id": "common_attacks",
+        "title": "รู้จักการโจมตีที่พบบ่อย",
+        "description": "phishing, SQL injection และ XSS"
+      },
+      {
+        "id": "secure_habits",
+        "title": "ฝึกนิสัยปลอดภัย",
+        "description": "ตั้ง 2FA และตรวจสิทธิ์แอปที่ใช้"
+      },
+      {
+        "id": "security_ctf",
+        "title": "ลองโจทย์ CTF ง่าย ๆ",
+        "description": "แก้โจทย์ความปลอดภัยระดับเริ่มต้น"
+      }
+    ]
+  },
+  {
+    "id": "3d_modeling",
+    "category": "skill",
+    "track": "game",
+    "title": "การสร้างโมเดล 3 มิติ",
+    "englishTitle": "3D Modeling",
+    "description": "เรียน Blender การขึ้นรูป วัสดุ และการทำโมเดลให้เสร็จ",
+    "tasks": [
+      {
+        "id": "learn_blender_tools",
+        "title": "เรียนรู้เครื่องมือ Blender",
+        "description": "ฝึกใช้เครื่องมือสำคัญสำหรับสร้างโมเดล"
+      },
+      {
+        "id": "model_an_object",
+        "title": "สร้างโมเดลวัตถุหนึ่งชิ้น",
+        "description": "เลือกวัตถุและสร้างรูปทรงให้ใกล้เคียงต้นแบบ"
+      },
+      {
+        "id": "practice_materials",
+        "title": "ฝึกวัสดุและพื้นผิว",
+        "description": "ทดลอง Material และ Texture กับโมเดลของคุณ"
+      },
+      {
+        "id": "complete_3d_model",
+        "title": "สร้างโมเดล 3 มิติให้เสร็จหนึ่งชิ้น",
+        "description": "สร้างโมเดลพร้อมวัสดุและนำเสนอผลงานให้เรียบร้อย"
+      }
+    ]
+  },
+  {
+    "id": "unity",
+    "category": "skill",
+    "track": "game",
+    "title": "Unity",
+    "englishTitle": "Unity",
+    "description": "เอนจินเกมยอดนิยม สร้างเกมได้ทั้ง 2D, 3D และมือถือด้วย C#",
+    "tasks": [
+      {
+        "id": "unity_basics",
+        "title": "ฝึกใช้ Unity Editor",
+        "description": "สร้าง scene, GameObject และ component"
+      },
+      {
+        "id": "csharp_scripting",
+        "title": "เขียนสคริปต์ C#",
+        "description": "ควบคุมการเคลื่อนที่และการชนของวัตถุ"
+      },
+      {
+        "id": "unity_physics_ui",
+        "title": "ฝึกฟิสิกส์และ UI",
+        "description": "ใช้ Rigidbody และสร้างหน้าจอ UI"
+      },
+      {
+        "id": "unity_mini_game",
+        "title": "มินิเกมใน Unity",
+        "description": "สร้างเกมสั้นที่เล่นได้จบหนึ่งด่าน"
+      }
+    ]
+  },
+  {
+    "id": "unreal_engine",
+    "category": "skill",
+    "track": "game",
+    "title": "Unreal Engine",
+    "englishTitle": "Unreal Engine",
+    "description": "เอนจินเกมกราฟิกระดับสูง ใช้ Blueprint และ C++",
+    "tasks": [
+      {
+        "id": "unreal_editor",
+        "title": "ฝึกใช้ Unreal Editor",
+        "description": "จัดฉาก แสง และวัตถุในด่าน"
+      },
+      {
+        "id": "blueprint_basics",
+        "title": "ฝึก Blueprint",
+        "description": "สร้างระบบเกมด้วย visual scripting"
+      },
+      {
+        "id": "unreal_cpp",
+        "title": "เขียน C++ ใน Unreal",
+        "description": "สร้าง Actor และ Component ด้วย C++"
+      },
+      {
+        "id": "unreal_mini_game",
+        "title": "มินิเกมใน Unreal",
+        "description": "สร้างด่านสั้นที่เล่นได้จริง"
+      }
+    ]
+  },
+  {
+    "id": "godot",
+    "category": "skill",
+    "track": "game",
+    "title": "Godot",
+    "englishTitle": "Godot Engine",
+    "description": "เอนจินเกมโอเพนซอร์ส เบาและเหมาะกับเกมอินดี้",
+    "tasks": [
+      {
+        "id": "godot_nodes",
+        "title": "ฝึกระบบ node",
+        "description": "สร้าง scene จาก node และจัดลำดับชั้น"
+      },
+      {
+        "id": "gdscript",
+        "title": "เขียน GDScript",
+        "description": "ควบคุมตัวละครและสัญญาณ (signal)"
+      },
+      {
+        "id": "godot_2d",
+        "title": "ทำเกม 2D",
+        "description": "ใช้ TileMap, animation และการชน"
+      },
+      {
+        "id": "godot_mini_game",
+        "title": "มินิเกมใน Godot",
+        "description": "สร้างเกมสั้นและ export ให้เพื่อนเล่น"
+      }
+    ]
+  },
+  {
+    "id": "pixel_art",
+    "category": "skill",
+    "track": "game",
+    "title": "พิกเซลอาร์ต",
+    "englishTitle": "Pixel Art",
+    "description": "วาดภาพทีละพิกเซลสำหรับเกมย้อนยุคและอินดี้",
+    "tasks": [
+      {
+        "id": "pixel_shapes",
+        "title": "ฝึกรูปทรงและเส้น",
+        "description": "วาดเส้นและรูปทรงให้คมในขนาดเล็ก"
+      },
+      {
+        "id": "pixel_palette",
+        "title": "ฝึกเลือกจานสี",
+        "description": "ใช้สีจำกัดให้ภาพดูกลมกลืน"
+      },
+      {
+        "id": "pixel_character",
+        "title": "วาดตัวละคร",
+        "description": "วาดตัวละครขนาด 32x32 พิกเซล"
+      },
+      {
+        "id": "pixel_animation",
+        "title": "ทำแอนิเมชันพิกเซล",
+        "description": "ทำท่าเดินหรือท่าหายใจ 4–8 เฟรม"
+      }
+    ]
+  },
+  {
+    "id": "game_design",
+    "category": "skill",
+    "track": "game",
+    "title": "การออกแบบเกม",
+    "englishTitle": "Game Design",
+    "description": "คิดกติกา ระบบ และความสนุกของเกมอย่างเป็นระบบ",
+    "tasks": [
+      {
+        "id": "core_loop",
+        "title": "ออกแบบ core loop",
+        "description": "กำหนดสิ่งที่ผู้เล่นทำซ้ำและเหตุผลที่สนุก"
+      },
+      {
+        "id": "game_jam",
+        "title": "เข้าร่วม game jam",
+        "description": "สร้างเกมตามธีมภายในเวลาจำกัด"
+      },
+      {
+        "id": "difficulty_curve",
+        "title": "ออกแบบความยาก",
+        "description": "วางความยากให้ค่อย ๆ เพิ่มอย่างเหมาะสม"
+      },
+      {
+        "id": "design_critique",
+        "title": "วิจารณ์งานออกแบบ",
+        "description": "วิเคราะห์จุดแข็งจุดอ่อนของเกมที่เล่น"
       }
     ]
   },
@@ -133,70 +1381,8 @@
         "title": "สนทนาภาษาอังกฤษจริง",
         "description": "สนทนากับอีกคนโดยใช้ภาษาอังกฤษให้มากที่สุด"
       }
-    ]
-  },
-  {
-    "id": "programming",
-    "category": "skill",
-    "title": "การเขียนโปรแกรม",
-    "englishTitle": "Programming",
-    "description": "ฝึกเขียนโค้ด อ่านเอกสาร และสร้างโปรเจกต์ด้วยตัวเอง",
-    "tasks": [
-      {
-        "id": "study_programming",
-        "title": "ศึกษาการเขียนโปรแกรม",
-        "description": "เรียนแนวคิดใหม่และทดลองเขียนโค้ดตามความเข้าใจ"
-      },
-      {
-        "id": "coding_problems",
-        "title": "แก้โจทย์เขียนโค้ด",
-        "description": "ฝึกแก้โจทย์และอธิบายวิธีคิดของตัวเอง"
-      },
-      {
-        "id": "read_documentation",
-        "title": "อ่านเอกสารประกอบ",
-        "description": "อ่านเอกสารทางการและทดลองใช้สิ่งที่เรียนรู้"
-      },
-      {
-        "id": "build_without_copying",
-        "title": "สร้างบางสิ่งโดยไม่คัดลอก",
-        "description": "สร้างฟีเจอร์หรือโปรแกรมด้วยความเข้าใจของตัวเอง"
-      },
-      {
-        "id": "mini_project",
-        "title": "มินิโปรเจกต์",
-        "description": "สร้างโปรเจกต์ขนาดเล็กที่ใช้งานหรือสาธิตได้"
-      }
-    ]
-  },
-  {
-    "id": "3d_modeling",
-    "category": "skill",
-    "title": "การสร้างโมเดล 3 มิติ",
-    "englishTitle": "3D Modeling",
-    "description": "เรียน Blender การขึ้นรูป วัสดุ และสร้างโมเดลให้เสร็จ",
-    "tasks": [
-      {
-        "id": "learn_blender_tools",
-        "title": "เรียนรู้เครื่องมือ Blender",
-        "description": "ฝึกใช้เครื่องมือสำคัญสำหรับสร้างโมเดล"
-      },
-      {
-        "id": "model_an_object",
-        "title": "สร้างโมเดลวัตถุหนึ่งชิ้น",
-        "description": "เลือกวัตถุและสร้างรูปทรงให้ใกล้เคียงต้นแบบ"
-      },
-      {
-        "id": "practice_materials",
-        "title": "ฝึกวัสดุและพื้นผิว",
-        "description": "ทดลอง Material และ Texture กับโมเดลของคุณ"
-      },
-      {
-        "id": "complete_3d_model",
-        "title": "สร้างโมเดล 3 มิติให้เสร็จหนึ่งชิ้น",
-        "description": "สร้างโมเดลพร้อมวัสดุและนำเสนอผลงานให้เรียบร้อย"
-      }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "public_speaking",
@@ -225,7 +1411,8 @@
         "title": "นำเสนอต่ออีกคนหนึ่ง",
         "description": "นำเสนอหัวข้อที่เลือกและขอความคิดเห็นหลังจบ"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "fitness",
@@ -254,7 +1441,8 @@
         "title": "ความท้าทายออกกำลังกายประจำสัปดาห์",
         "description": "ทำโปรแกรมออกกำลังกายที่ท้าทายกว่าวันปกติ"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "healthy_lifestyle",
@@ -283,7 +1471,8 @@
         "title": "ทำกิจวัตรตามแผนครบหนึ่งสัปดาห์",
         "description": "รักษาแผนออกกำลังกายและอาหารให้ครบตามที่ตั้งไว้"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "save_money",
@@ -312,7 +1501,8 @@
         "title": "ทำเป้าหมายเงินออมประจำเดือน",
         "description": "ออมเงินให้ได้ตามเป้าหมายของเดือนนี้"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "read_more",
@@ -341,7 +1531,8 @@
         "title": "อ่านหนังสือจบหนึ่งเล่ม",
         "description": "อ่านหนังสือที่เลือกจนจบและบันทึกสิ่งที่ได้เรียนรู้"
       }
-    ]
+    ],
+    "retired": true
   },
   {
     "id": "travel_goal",
@@ -375,6 +1566,7 @@
         "title": "ออกเดินทางจริง",
         "description": "ทำทริปที่วางแผนไว้ให้สำเร็จอย่างปลอดภัย"
       }
-    ]
+    ],
+    "retired": true
   }
 ]

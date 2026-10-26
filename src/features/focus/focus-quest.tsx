@@ -11,6 +11,7 @@ import { formatTime, roundLabels } from "./rules";
 import { CompletionConfirmation, CompletionResult } from "./completion";
 import { FocusScene } from "./focus-scene";
 import {BossBattle} from '../boss/boss-battle';
+import {ReviewPanel} from '../quests/review-panel';
 import {EvidencePanel} from '../evidence/evidence-panel';
 
 export function FocusQuest({ quest }: { quest: Quest }) {
@@ -49,6 +50,6 @@ export function FocusQuest({ quest }: { quest: Quest }) {
       <ul className="focus-checklist">{quest.steps.map(step => <li key={step.id}><label><input type="checkbox" checked={focus.checkedStepIds.includes(step.id)} onChange={event => { void setStepChecked(quest.id, step.id, event.target.checked); }} /><span>{step.text}</span></label></li>)}</ul>
       <div className="success-box"><div><h3>เงื่อนไขสำเร็จ</h3><p>{quest.success}</p></div></div><p className="focus-note">เช็กครบหรือเวลาครบไม่ทำให้ผ่านเควสต์อัตโนมัติ<br />เวลานี้เป็นบันทึกการโฟกัสที่คุณรายงาน ไม่ใช่หลักฐานว่างานสำเร็จ</p>
     </section></div>
-    <div className="focus-after"><BossBattle quest={quest}/><EvidencePanel questId={quest.id}/><CompletionConfirmation quest={quest} onSaved={() => setFreshQuestId(quest.id)} /></div>
+    <div className="focus-after"><ReviewPanel quest={quest}/><BossBattle quest={quest}/><EvidencePanel questId={quest.id}/><CompletionConfirmation quest={quest} onSaved={() => setFreshQuestId(quest.id)} /></div>
   </>;
 }

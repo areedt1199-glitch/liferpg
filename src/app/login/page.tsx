@@ -1,84 +1,41 @@
-import { cookies } from 'next/headers';
+import fs from 'node:fs';
+import path from 'node:path';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { serverClient } from '@/lib/supabase/server';
 import { supabaseConfig } from '@/lib/supabase/config';
 import { LoginForms } from '@/features/account/login-forms';
 import { enterDemo } from '@/features/account/actions';
-import { redirect } from 'next/navigation';
+import { Icon } from '@/components/ui/icon';
+import { FantasyForest } from '@/features/account/fantasy-forest';
 
-export default async function LoginPage() {
+// A looping clip placed here replaces the animated illustration; nothing is loaded from other sites.
+const VIDEO = '/images/login/forest.mp4';
+
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ auth?: string; signup?: string }> }) {
   const configured = !!supabaseConfig();
   const client = await serverClient();
-
   if (client) {
-    try {
-      const { data, error } = await client.auth.getUser();
-      if (data.user && !error) redirect('/profile');
-    } catch { /* stay on login */ }
+    let signedIn = false;
+    try { const { data, error } = await client.auth.getUser(); signedIn = !!data.user && !error; } catch { /* stay on login */ }
+    if (signedIn) redirect('/profile');
   }
-
-  return (
-    <div style={{
-      minHeight: '100dvh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(160deg, #0a1f18 0%, #173e32 30%, #1a4a3a 50%, #0d2a20 80%, #091a14 100%)',
-      padding: '20px',
-      fontFamily: '"Noto Sans Thai","Leelawadee UI",Tahoma,system-ui,sans-serif',
-    }}>
-      <div style={{
-        width: '100%', maxWidth: '420px',
-        display: 'flex', flexDirection: 'column' as const, alignItems: 'center',
-      }}>
-        {/* Logo */}
-        <h1 style={{
-          fontFamily: 'Georgia,"Times New Roman",serif',
-          fontSize: 'clamp(42px, 8vw, 56px)',
-          fontWeight: 'bold', letterSpacing: '-1px',
-          color: '#f1dfad', textAlign: 'center' as const, margin: 0,
-        }}>
-          Life<span style={{ color: '#956c23' }}>RPG</span>
-        </h1>
-        <p style={{
-          fontSize: '11px', letterSpacing: '3px',
-          color: 'rgba(241,223,173,0.5)', margin: '6px 0 28px',
-        }}>YOUR LIFE. YOUR QUEST.</p>
-
-        {/* Glass Card */}
-        <div style={{
-          width: '100%',
-          background: 'rgba(255,253,247,0.08)',
-          backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(241,223,173,0.15)',
-          borderRadius: '20px',
-          padding: '32px 28px',
-        }}>
-          {configured ? (
-            <LoginForms />
-          ) : (
-            <div>
-              <p style={{ color: '#f5a623' }}>⚠️ ยังไม่ได้ตั้งค่าฐานข้อมูล</p>
-              <p style={{ fontSize: '13px', color: 'rgba(241,223,173,0.4)' }}>
-                ตั้งค่า Supabase ตามคู่มือก่อนใช้งาน
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Demo */}
-        <div style={{ marginTop: '24px', textAlign: 'center' as const }}>
-          <p style={{ fontSize: '12px', color: 'rgba(241,223,173,0.3)', marginBottom: '12px' }}>หรือ</p>
-          <form action={enterDemo}>
-            <button type="submit" style={{
-              border: '1px solid rgba(241,223,173,0.2)',
-              background: 'rgba(255,255,255,0.06)',
-              color: '#f1dfad', fontSize: '14px',
-              padding: '10px 28px', borderRadius: '12px',
-              cursor: 'pointer', fontFamily: 'inherit',
-            }}>
-              🎮 ลองเล่น Demo ก่อน
-            </button>
-          </form>
-        </div>
+  const query = await searchParams;
+  const video = fs.existsSync(path.join(process.cwd(), 'public', VIDEO));
+  return <div className="login-page">
+    <div className="login-main">
+      <Link className="login-logo" href="/today"><Icon name="leaf" />liferpg<span>.</span></Link>
+      <div className="login-column">
+        <span className="login-emblem" aria-hidden="true"><Icon name="leaf" /></span>
+        {configured ? <LoginForms startWithSignup={query.signup === '1'} authError={query.auth === 'error'} /> : <div className="login-unconfigured"><h1>ยังไม่ได้ตั้งค่าฐานข้อมูล</h1><p>ตั้งค่า Supabase ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ ระหว่างนี้ลองเล่นแบบ demo ได้</p></div>}
+        <div className="login-or"><span>หรือ</span></div>
+        <form action={enterDemo}><button type="submit" className="login-demo">ลองเล่นแบบ demo ในเบราว์เซอร์นี้</button></form>
+        <p className="login-fine">ข้อมูล demo เก็บในเครื่องนี้เท่านั้น แยกจากบัญชีจริง</p>
       </div>
     </div>
-  );
+    <aside className="login-art" aria-hidden="true">
+      {video ? <video className="login-video" src={VIDEO} autoPlay muted loop playsInline /> : <FantasyForest />}
+      <p className="login-art-caption">YOUR LIFE. YOUR QUEST.</p>
+    </aside>
+  </div>;
 }

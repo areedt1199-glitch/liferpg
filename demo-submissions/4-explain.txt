@@ -1,0 +1,5 @@
+ติดตั้ง Python 3.12 จาก python.org และติ๊ก Add to PATH ตอนติดตั้ง
+เปิด Terminal พิมพ์ python --version ได้ผลเป็น Python 3.12.4 แปลว่าติดตั้งสำเร็จ
+สร้างไฟล์ hello.py เขียน print("Hello World") แล้วรันด้วย python hello.py
+หน้าจอแสดงข้อความ Hello World ออกมา
+สิ่งที่ได้เรียนรู้: ต้องเพิ่ม Python ลงใน PATH ก่อน ไม่อย่างนั้น Terminal จะหาคำสั่ง python ไม่เจอ

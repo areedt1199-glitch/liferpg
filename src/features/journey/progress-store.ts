@@ -1,7 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
-import { initialProgress, parseProgress, selectGoal, startQuest, updateChecklist, updateRound, completeQuest, selectCareer, buySkin, equipSkin, buyItem, consumeItem, type UserProgress } from "./progress";
-import {attemptBoss,attachEvidence,detachEvidence,completePractice} from './progress';
+import { initialProgress, parseProgress, addGoal, abandonGoal, startQuest, updateChecklist, updateRound, completeQuest, selectCareer, buySkin, equipSkin, buyItem, consumeItem, type UserProgress,addJournal,removeJournal,type JournalEntry} from "./progress";
+import {attemptBoss,attachEvidence,detachEvidence,completePractice,addPlan,removePlan,setPlanDone,type PlanItem} from './progress';
 import type {EvidenceRecord} from '../evidence/types';
 export const STORAGE_KEY = "liferpg.progress.v1";
 const LOCK_NAME = "liferpg.progress.write";
@@ -87,7 +87,9 @@ async function commit(action:string,payload:Record<string,unknown>,change:(progr
     latestRead++; acceptServer(value); notifyAccountChanged();return true;
   } catch {if (generation===current)publish({...snapshot,error:'บันทึกไม่สำเร็จ ลองใหม่ได้ ระบบยังไม่ยืนยันการรับรางวัล'});return false;}
 }
-export function chooseGoal(goalId:string) {return commit('select',{goalId},p=>selectGoal(p,goalId));}
+export function chooseGoal(goalId:string) {return commit('add_goal',{goalId},p=>addGoal(p,goalId,Date.now()));}
+/** Clears the goal's map progress; earned XP and coins stay. Account photos are deleted first by the caller. */
+export function dropGoal(goalId:string) {return commit('abandon_goal',{goalId},p=>abandonGoal(p,goalId));}
 export function beginQuest(questId:string) {return commit('start_quest',{questId},p=>startQuest(p,questId));}
 export function setStepChecked(questId:string,stepId:string,checked:boolean) {return commit('check',{questId,stepId,checked},p=>updateChecklist(p,questId,stepId,checked));}
 export function controlRound(questId:string,action:'start'|'pause'|'resume'|'new'|'finish') {return commit(action,{questId},p=>updateRound(p,questId,action,Date.now()));}
@@ -102,5 +104,11 @@ export function practiceTask(taskId:string){return commit('practice',{taskId},p=
 export function submitBoss(questId:string,answers:Record<string,number>,battleId=''){return commit('boss_attempt',{questId,answers,battleId},p=>attemptBoss(p,questId,answers,Date.now(),battleId));}
 export function saveDemoEvidence(record:EvidenceRecord){if(snapshot.mode!=='demo')return Promise.resolve(false);return demoCommit(p=>attachEvidence(p,record));}
 export function removeDemoEvidence(questId:string){if(snapshot.mode!=='demo')return Promise.resolve(false);return demoCommit(p=>detachEvidence(p,questId));}
+export function planSlot(item:PlanItem){return commit('plan_add',{...item},p=>addPlan(p,item));}
+export function unplanSlot(id:string){return commit('plan_remove',{id},p=>removePlan(p,id));}
+export function markSlotDone(id:string,done:boolean){return commit('plan_done',{id,done},p=>setPlanDone(p,id,done));}
+/** Journal writes: the server stamps the time in account mode; demo uses this browser's clock. */
+export function writeJournal(entry:Omit<JournalEntry,'createdAt'>){return commit('journal_add',{...entry},p=>addJournal(p,{...entry,createdAt:Date.now()}));}
+export function eraseJournal(id:string){return commit('journal_remove',{id},p=>removeJournal(p,id));}
 export function reloadProgress() {return readStorage();}
 export function useProgress() {return useSyncExternalStore(subscribe,()=>snapshot,()=>serverSnapshot);}

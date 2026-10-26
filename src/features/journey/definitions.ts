@@ -1,10 +1,15 @@
 import type { Quest } from "@/features/quests/types";
+import { knowledgePaths } from "@/features/knowledge";
 
 // Content definitions only. User progress is stored separately.
+export type GoalDefinition = { id: string; title: string; description: string; track: string; finish: string; quests: Quest[] };
+
 export const journeyDefinition = {
   id: "first-game",
   title: "สร้างเกมแรก",
   description: "จากบรรทัดแรก สู่เกมเล็ก ๆ ที่คุณสร้างเอง",
+  track: "game",
+  finish: "เกมแรกของคุณพร้อมให้โลกเห็น",
   quests: [
     { id: "tools", title: "เตรียมเครื่องมือ", task: "ติดตั้งเครื่องมือและรัน Hello World", place: "หมู่บ้านเริ่มต้น", minutes: 20, xp: 120, coins: 105, steps: [{ id: "install-tools", text: "ติดตั้งเครื่องมือเขียนโปรแกรม" }, { id: "create-file", text: "สร้างไฟล์โปรแกรมแรก" }, { id: "hello-world", text: "รัน Hello World" }], success: "ติดตั้งเครื่องมือสำเร็จและแสดงข้อความ Hello World ได้" },
     { id: "variables", title: "ตัวแปรและเงื่อนไข", task: "เขียนโปรแกรมรับค่าและใช้ if/else", place: "ป่าของการเรียนรู้", minutes: 25, xp: 80, coins: 60, steps: [{ id: "read-conditions", text: "อ่านตัวอย่างตัวแปรและ if/else" }, { id: "receive-score", text: "เขียนโปรแกรมรับคะแนน" }, { id: "show-result", text: "แสดงผลผ่าน/ไม่ผ่านด้วยเงื่อนไข" }], success: "โปรแกรมรันได้และทดลองทั้งกรณีผ่านกับไม่ผ่าน" },
@@ -16,5 +21,27 @@ export const journeyDefinition = {
     { id: "publish-game", title: "เผยแพร่เกมและรับฟีดแบ็ก", task: "เขียน README ให้เพื่อนลองเล่น แล้วรวบรวมฟีดแบ็ก", place: "สวรรค์ชั้นฟ้า", minutes: 30, xp: 150, coins: 180, steps: [{ id: "write-readme", text: "เขียน README บอกวิธีรันและวิธีเล่น" }, { id: "share-game", text: "ให้เพื่อนอย่างน้อย 1 คนลองเล่น" }, { id: "collect-feedback", text: "จดฟีดแบ็กและเลือกสิ่งที่จะปรับต่อ" }], success: "มีคนอื่นได้เล่นเกมของคุณ และคุณมีรายการสิ่งที่จะปรับต่อ" },
   ] satisfies Quest[],
 };
-export function findQuest(id: string): Quest | undefined { return journeyDefinition.quests.find(quest => quest.id === id); }
 
+// Career/skill paths become goals: one level per practice task (ids `${pathId}.${taskId}`), bosses from the knowledge quiz.
+const PATH_PLACES = ["หมู่บ้านเริ่มต้น", "ป่าของการเรียนรู้", "ค่ายฝึก", "ดันเจี้ยนแห่งการทดสอบ", "ยอดเขาจุดหมาย", "ห้องใต้ดินปราสาท", "ปราสาทมืด", "สวรรค์ชั้นฟ้า"];
+export const pathQuestId = (pathId: string, taskId: string) => `${pathId}.${taskId}`;
+const pathGoals: GoalDefinition[] = knowledgePaths().map(k => ({
+  id: k.pathId, title: k.title, description: k.intro, track: k.track, finish: `ผ่านเส้นทาง${k.title}ครบทุกด่าน`,
+  quests: k.lessons.map((l, i, all) => ({
+    id: pathQuestId(k.pathId, l.taskId), title: l.title, task: l.description,
+    place: PATH_PLACES[Math.round(i * (PATH_PLACES.length - 1) / Math.max(1, all.length - 1))], minutes: 25, xp: 80 + 20 * i, coins: 60 + 30 * i,
+    steps: [
+      { id: "read", text: "อ่านสรุปความรู้ของด่านนี้ในคลังความรู้" },
+      { id: "practice", text: `ลงมือฝึก: ${l.description}` },
+      { id: "reflect", text: "จดสิ่งที่ได้เรียนรู้หรือจุดที่ยังติดขัดอย่างน้อย 1 ข้อ" },
+    ],
+    success: `ทำ “${l.title}” ได้จริงอย่างน้อยหนึ่งครั้ง และอธิบายสิ่งที่เรียนรู้ด้วยคำพูดของตัวเองได้`,
+  })),
+}));
+
+export const goalDefinitions: GoalDefinition[] = [journeyDefinition, ...pathGoals];
+const goalById = new Map(goalDefinitions.map(g => [g.id, g]));
+const goalByQuest = new Map(goalDefinitions.flatMap(g => g.quests.map(q => [q.id, g] as const)));
+export function findGoal(id: string): GoalDefinition | undefined { return goalById.get(id); }
+export function goalOfQuest(questId: string): GoalDefinition | undefined { return goalByQuest.get(questId); }
+export function findQuest(id: string): Quest | undefined { return goalByQuest.get(id)?.quests.find(quest => quest.id === id); }

@@ -1,11 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import { controlRound, useProgress, progressNow } from "@/features/journey/progress-store";
-import { focusView } from "./rules";
+import { findQuest } from "@/features/journey/definitions";
+import { focusView, initialFocus, type QuestFocus } from "./rules";
 
+// Quests of goals that are not added have no focus entry; show a stable idle round instead.
+const idle = new Map<string, QuestFocus>();
+function idleFocus(questId: string) {
+  let focus = idle.get(questId);
+  if (!focus) { focus = initialFocus((findQuest(questId)?.minutes ?? 25) * 60_000); idle.set(questId, focus); }
+  return focus;
+}
 export function useFocusView(questId: string) {
   const { ready, progress, error } = useProgress();
-  const focus = progress.focus[questId];
+  const focus = progress.focus[questId] ?? idleFocus(questId);
   const [now, setNow] = useState(0);
   useEffect(() => {
     let finishing = false;

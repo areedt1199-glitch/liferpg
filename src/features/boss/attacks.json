@@ -1,0 +1,230 @@
+{
+ "skin": {
+  "wizard": {
+   "frames": 3,
+   "w": 441,
+   "h": 170,
+   "ax": 109,
+   "ay": 169,
+   "bodyH": 168
+  },
+  "priest": {
+   "frames": 3,
+   "w": 430,
+   "h": 227,
+   "ax": 103,
+   "ay": 209,
+   "bodyH": 163
+  },
+  "ninja": {
+   "frames": 3,
+   "w": 441,
+   "h": 203,
+   "ax": 223,
+   "ay": 201,
+   "bodyH": 160
+  },
+  "swordsman": {
+   "frames": 3,
+   "w": 360,
+   "h": 215,
+   "ax": 146,
+   "ay": 213,
+   "bodyH": 177
+  },
+  "knight": {
+   "frames": 3,
+   "w": 390,
+   "h": 220,
+   "ax": 153,
+   "ay": 219,
+   "bodyH": 211
+  },
+  "archer": {
+   "frames": 2,
+   "w": 397,
+   "h": 217,
+   "ax": 89,
+   "ay": 215,
+   "bodyH": 212
+  },
+  "rogue": {
+   "frames": 3,
+   "w": 325,
+   "h": 205,
+   "ax": 185,
+   "ay": 191,
+   "bodyH": 162
+  },
+  "bard": {
+   "frames": 3,
+   "w": 371,
+   "h": 230,
+   "ax": 124,
+   "ay": 228,
+   "bodyH": 215
+  },
+  "farmer": {
+   "frames": 3,
+   "w": 454,
+   "h": 191,
+   "ax": 273,
+   "ay": 189,
+   "bodyH": 173
+  },
+  "guard": {
+   "frames": 3,
+   "w": 390,
+   "h": 216,
+   "ax": 119,
+   "ay": 213,
+   "bodyH": 208
+  },
+  "slime": {
+   "frames": 3,
+   "w": 534,
+   "h": 186,
+   "ax": 371,
+   "ay": 99,
+   "bodyH": 150
+  },
+  "monk": {
+   "frames": 3,
+   "w": 585,
+   "h": 232,
+   "ax": 261,
+   "ay": 216,
+   "bodyH": 164
+  },
+  "paladin": {
+   "frames": 3,
+   "w": 623,
+   "h": 257,
+   "ax": 259,
+   "ay": 254,
+   "bodyH": 182
+  },
+  "blacksmith": {
+   "frames": 3,
+   "w": 461,
+   "h": 224,
+   "ax": 172,
+   "ay": 222,
+   "bodyH": 152
+  },
+  "goblin": {
+   "frames": 3,
+   "w": 410,
+   "h": 180,
+   "ax": 217,
+   "ay": 178,
+   "bodyH": 162
+  },
+  "wolf": {
+   "frames": 3,
+   "w": 366,
+   "h": 218,
+   "ax": 182,
+   "ay": 154,
+   "bodyH": 124
+  },
+  "skeleton": {
+   "frames": 3,
+   "w": 353,
+   "h": 234,
+   "ax": 139,
+   "ay": 232,
+   "bodyH": 202
+  },
+  "samurai": {
+   "frames": 3,
+   "w": 710,
+   "h": 231,
+   "ax": 425,
+   "ay": 221,
+   "bodyH": 187
+  },
+  "elf": {
+   "frames": 2,
+   "w": 411,
+   "h": 202,
+   "ax": 72,
+   "ay": 200,
+   "bodyH": 174
+  },
+  "dwarf": {
+   "frames": 3,
+   "w": 317,
+   "h": 242,
+   "ax": 133,
+   "ay": 240,
+   "bodyH": 165
+  }
+ },
+ "boss": {
+  "drunk": {
+   "frames": 3,
+   "w": 637,
+   "h": 386,
+   "ax": 255,
+   "ay": 374,
+   "bodyH": 286
+  },
+  "wizard": {
+   "frames": 3,
+   "w": 511,
+   "h": 447,
+   "ax": 200,
+   "ay": 439,
+   "bodyH": 316
+  },
+  "ophanim": {
+   "frames": 3,
+   "w": 549,
+   "h": 368,
+   "ax": 394,
+   "ay": 300,
+   "bodyH": 262
+  },
+  "boneeye": {
+   "frames": 3,
+   "w": 701,
+   "h": 382,
+   "ax": 572,
+   "ay": 352,
+   "bodyH": 272
+  },
+  "gnome": {
+   "frames": 3,
+   "w": 490,
+   "h": 404,
+   "ax": 372,
+   "ay": 374,
+   "bodyH": 271
+  },
+  "mushroom": {
+   "frames": 2,
+   "w": 250,
+   "h": 314,
+   "ax": 121,
+   "ay": 312,
+   "bodyH": 290
+  },
+  "wolf": {
+   "frames": 3,
+   "w": 502,
+   "h": 379,
+   "ax": 279,
+   "ay": 326,
+   "bodyH": 202
+  },
+  "rocker": {
+   "frames": 3,
+   "w": 602,
+   "h": 418,
+   "ax": 256,
+   "ay": 408,
+   "bodyH": 361
+  }
+ }
+}

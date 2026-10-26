@@ -1,4 +1,5 @@
 import careers from '../careers/catalog.json';
+import { knowledgePaths } from '../knowledge';
 const basics=[
  {id:'variables',title:'ตัวแปรและเงื่อนไข',content:'ตัวแปรเก็บค่าที่โปรแกรมนำไปใช้ เช่น score = 60 ส่วน if/else เลือกการทำงานตามเงื่อนไข ลองรับคะแนนแล้วแสดงผ่านเมื่อ score >= 50 และไม่ผ่านเมื่อคะแนนต่ำกว่า 50 ทดสอบทั้งสองกรณีก่อนยืนยันเควสต์',keywords:['ตัวแปร','if','else','คะแนน','เงื่อนไข']},
  {id:'loops',title:'ฝึกลูป',content:'ลูปทำงานซ้ำตามจำนวนรอบหรือเงื่อนไข เริ่มจากแสดงเลข 1 ถึง 5 ตรวจว่าตัวแปรควบคุมเปลี่ยนค่าทุกรอบและมีทางหยุด เพื่อหลีกเลี่ยงการวนซ้ำไม่สิ้นสุด',keywords:['ลูป','loop','for','while','ทำซ้ำ']},
@@ -12,5 +13,10 @@ export function searchLibrary(question:string,pathId?:string):LibraryAnswer[]{
  const words=query.split(/[\s?？,]+/).filter(Boolean);
  const scored=basics.map(b=>({...b,score:b.keywords.reduce((n,w)=>n+(query.includes(w)?2:0),0)})).filter(b=>b.score>0).sort((a,b)=>b.score-a.score).slice(0,3).map(b=>({title:b.title,content:b.content,href:`/quests/${b.id}`}));
  if(scored.length)return scored;
- return careers.filter(c=>(!pathId||c.id===pathId)&&words.some(w=>`${c.title} ${c.englishTitle} ${c.description} ${c.tasks.map(t=>t.title).join(' ')}`.toLowerCase().includes(w))).slice(0,3).map(c=>({title:c.title,content:`${c.description}\n${c.tasks.map((t,i)=>`${i+1}. ${t.title}: ${t.description}`).join('\n')}`,href:'/careers'}));
+ // Knowledge-bank lessons: Thai words from the question, plus English terms (docker, sql, react…) found inside the question.
+ const lessons=knowledgePaths().filter(k=>!pathId||k.pathId===pathId).flatMap(k=>k.lessons.map(l=>{const text=`${k.title} ${k.englishTitle} ${l.title} ${l.description} ${l.points.join(' ')}`.toLowerCase();const terms=new Set(text.match(/[a-z][a-z0-9+#.-]{2,}/g)??[]);
+  const score=words.filter(w=>w.length>1&&text.includes(w)).length*2+[...terms].filter(t=>query.includes(t)).length;return {score,title:`${k.title} · ${l.title}`,content:l.points.map(p=>`• ${p}`).join('\n'),href:`/learn/${k.pathId}`};}))
+  .filter(l=>l.score>0).sort((a,b)=>b.score-a.score).slice(0,3).map(({title,content,href})=>({title,content,href}));
+ if(lessons.length)return lessons;
+ return careers.filter(c=>!('retired' in c)&&(!pathId||c.id===pathId)&&words.some(w=>`${c.title} ${c.englishTitle} ${c.description} ${c.tasks.map(t=>t.title).join(' ')}`.toLowerCase().includes(w))).slice(0,3).map(c=>({title:c.title,content:`${c.description}\n${c.tasks.map((t,i)=>`${i+1}. ${t.title}: ${t.description}`).join('\n')}`,href:'/careers'}));
 }
