@@ -54,3 +54,4 @@ supabase/.temp/
 
 # Android app shell (mobile/): dependencies are installed locally
 mobile/node_modules/
+/submission/
