@@ -1,0 +1,14 @@
+{
+  "appId": "app.liferpg.android",
+  "appName": "liferpg",
+  "webDir": "www",
+  "server": {
+    "url": "https://liferpg-five-zeta.vercel.app",
+    "cleartext": false
+  },
+  "appendUserAgent": "liferpgApp",
+  "backgroundColor": "#173e32",
+  "android": {
+    "allowMixedContent": false
+  }
+}

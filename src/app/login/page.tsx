@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { serverClient } from '@/lib/supabase/server';
 import { supabaseConfig } from '@/lib/supabase/config';
 import { LoginForms } from '@/features/account/login-forms';
@@ -21,13 +22,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     if (signedIn) redirect('/profile');
   }
   const query = await searchParams;
+  // The Android app (mobile/) tags its WebView; Google refuses sign-in inside embedded WebViews.
+  const inApp = ((await headers()).get('user-agent') ?? '').includes('liferpgApp');
   const video = fs.existsSync(path.join(process.cwd(), 'public', VIDEO));
   return <div className="login-page">
     <div className="login-main">
       <Link className="login-logo" href="/today"><Icon name="leaf" />liferpg<span>.</span></Link>
       <div className="login-column">
         <span className="login-emblem" aria-hidden="true"><Icon name="leaf" /></span>
-        {configured ? <LoginForms startWithSignup={query.signup === '1'} startWithForgot={query.forgot === '1'} authError={query.auth === 'error'} /> : <div className="login-unconfigured"><h1>ยังไม่ได้ตั้งค่าฐานข้อมูล</h1><p>ตั้งค่า Supabase ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ ระหว่างนี้ลองเล่นแบบ demo ได้</p></div>}
+        {configured ? <LoginForms startWithSignup={query.signup === '1'} startWithForgot={query.forgot === '1'} inApp={inApp} authError={query.auth === 'error'} /> : <div className="login-unconfigured"><h1>ยังไม่ได้ตั้งค่าฐานข้อมูล</h1><p>ตั้งค่า Supabase ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ ระหว่างนี้ลองเล่นแบบ demo ได้</p></div>}
         <div className="login-or"><span>หรือ</span></div>
         <form action={enterDemo}><button type="submit" className="login-demo">ลองเล่นแบบ demo ในเบราว์เซอร์นี้</button></form>
         <p className="login-fine">ข้อมูล demo เก็บในเครื่องนี้เท่านั้น แยกจากบัญชีจริง</p>

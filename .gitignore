@@ -51,3 +51,6 @@ supabase/.temp/
 
 .vercel
 .env*
+
+# Android app shell (mobile/): dependencies are installed locally
+mobile/node_modules/
