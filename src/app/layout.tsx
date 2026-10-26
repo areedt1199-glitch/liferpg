@@ -5,6 +5,7 @@ import { ProgressProvider } from "@/features/account/progress-provider";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { geminiReady } from "@/lib/gemini";
 import "./globals.css";
 const body = Noto_Sans_Thai({ subsets: ["thai", "latin"], variable: "--font-body", display: "swap" });
 // "Adventurer's journal" type: storybook serif headings, Cinzel inscriptions, pixel numerals for game stats; body stays plain for reading.
@@ -15,5 +16,5 @@ export const metadata: Metadata = { title: "liferpg · การผจญภั�
 export const viewport: Viewport = { themeColor: "#173e32" };
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const mode = (await cookies()).get("liferpg-mode")?.value === "demo" ? "demo" : "account";
-  return <html lang="th" className={`${body.variable} ${display.variable} ${rune.variable} ${pixel.variable}`}><body><ProgressProvider mode={mode} configured={!!supabaseConfig()}><AppShell>{children}</AppShell></ProgressProvider></body></html>;
+  return <html lang="th" className={`${body.variable} ${display.variable} ${rune.variable} ${pixel.variable}`}><body><ProgressProvider mode={mode} configured={!!supabaseConfig()}><AppShell aiReady={geminiReady()}>{children}</AppShell></ProgressProvider></body></html>;
 }

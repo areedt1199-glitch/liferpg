@@ -1307,3 +1307,36 @@ h2, h3 { font-family: var(--font-display), var(--font-sans); }
   .guild-ranks img { width: 38px; height: 38px; }
   .guild-invite { justify-items: start; }
 }
+
+/* ── Floating assistant (every page) ── */
+.chat-bubble { position: fixed; z-index: 8; right: 24px; bottom: 24px; width: 58px; height: 58px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--gold-bright); background: var(--forest); color: var(--surface); font-size: 20px; cursor: pointer; box-shadow: 0 6px 20px #0f2b2340; transition: transform .15s, background .15s; }
+.chat-bubble:hover { transform: translateY(-2px); background: var(--forest-soft); }
+.chat-bubble:focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 3px; }
+.chat-bubble svg { width: 26px; height: 26px; }
+.chat-float { position: fixed; z-index: 8; right: 24px; bottom: 96px; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 140px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; border: 1px solid var(--frame); background: var(--surface); box-shadow: 0 18px 50px #0f2b2340; animation: chat-float-in .18s ease-out; }
+.chat-float[hidden] { display: none; }
+@keyframes chat-float-in { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+.chat-float-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 10px 10px 16px; background: var(--forest); color: var(--surface); }
+.chat-float-head span { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.chat-float-head svg { width: 20px; height: 20px; color: var(--gold-bright); }
+.chat-float-head button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 16px; cursor: pointer; }
+.chat-float-head button:hover { background: #ffffff1f; }
+.chat-float-body { flex: 1; min-height: 0; display: flex; }
+.chat-float-loading { margin: auto; color: var(--muted); font-size: 14px; }
+.chat-float .chat-panel { flex: 1; min-width: 0; margin: 0; padding: 12px 14px; border: 0; border-radius: 0; display: flex; flex-direction: column; background: transparent; }
+.chat-float .growth-filters { margin: 0 0 6px; gap: 6px; }
+.chat-float .growth-filters button { padding: 5px 12px; font-size: 13px; }
+.chat-float .muted { font-size: 12px; line-height: 1.5; }
+.chat-float .chat-consent { margin: 8px 0; font-size: 12px; }
+.chat-float .chat-messages { flex: 1; min-height: 80px; overflow-y: auto; margin: 8px 0; padding-right: 4px; }
+.chat-float .chat-welcome { padding: 24px 0; font-size: 14px; }
+.chat-float .chat-message { padding: 12px 0; font-size: 14px; }
+.chat-float form label { font-size: 12px; margin-bottom: 4px; }
+.chat-float textarea { min-height: 0; height: 64px; padding: 10px 12px; resize: none; }
+.chat-float form .primary-link { margin-top: 8px; min-height: 40px; border: 0; font: inherit; font-size: 14px; cursor: pointer; }
+.chat-float form .muted { display: none; }
+@media (max-width: 767px) {
+  .chat-bubble { right: 16px; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 14px); width: 52px; height: 52px; }
+  .chat-float { right: 8px; left: 8px; width: auto; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 76px); height: min(560px, calc(100dvh - var(--nav-height) - 150px)); }
+}
+@media (prefers-reduced-motion: reduce) { .chat-float { animation: none; } .chat-bubble { transition: none; } }

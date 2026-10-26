@@ -7,6 +7,7 @@ import { PlayerHud } from "@/features/character/player-hud";
 import { LevelUp } from "@/features/character/level-up";
 import { BadgeToast } from "@/features/character/badge-grid";
 import { PendingGoal } from "@/features/onboarding/path-finder-quiz";
+import { ChatFloat } from "@/features/chat/chat-float";
 type MenuItem = { href: string; label: string; icon: IconName; tab?: boolean; short?: string };
 // Grouped sidebar menu; `tab` items also appear in the mobile bottom bar, the rest live under "เพิ่มเติม".
 const groups: { title: string; items: MenuItem[] }[] = [
@@ -35,7 +36,7 @@ function NavLink({ item, pathname, className, short = false }: { item: MenuItem;
   const active = isActive(item.href, pathname);
   return <Link href={item.href} className={`${className} ${active ? "active" : ""}`} aria-current={active ? "page" : undefined}><Icon name={item.icon} /><span>{short ? item.short ?? item.label : item.label}</span></Link>;
 }
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, aiReady = false }: { children: ReactNode; aiReady?: boolean }) {
   const pathname = usePathname(); const more = useRef<HTMLDetailsElement>(null);
   useEffect(() => { if (more.current) more.current.open = false; }, [pathname]);
   // Sign-in, the guest landing, the path finder and public portfolios stand on their own without the game menu.
@@ -62,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="workspace">
       <header className="topbar"><Link className="topbar-brand" href="/today"><Icon name="leaf" />liferpg<span>.</span></Link><PlayerHud /></header>
       <main id="main" tabIndex={-1}>{children}</main>
-      <LevelUp /><BadgeToast /><PendingGoal />
+      <LevelUp /><BadgeToast /><PendingGoal /><ChatFloat aiReady={aiReady} />
       <footer className="page-footer">เติบโตทีละก้าว ในจังหวะของคุณ <Link href="/credits">เครดิตเพลงและภาพ</Link></footer>
     </div>
   </div>;
