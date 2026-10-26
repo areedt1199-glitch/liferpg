@@ -35,8 +35,6 @@ export function Landing() {
       </div>
       <div className="landing-stage" aria-hidden="true">
         <img className="landing-hero-img" src="/images/login/hero.webp" alt="" />
-        <img className="landing-hero-skin" src={skinImage('swordsman')} alt="" />
-        <img className="landing-hero-boss" src={bossImage('wolf')} alt="" />
       </div>
     </section>
 
