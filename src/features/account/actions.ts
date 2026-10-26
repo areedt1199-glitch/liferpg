@@ -93,3 +93,19 @@ export async function updatePassword(_previous: AuthState, form: FormData): Prom
   } catch { return {message:authMessage(),error:true}; }
   redirect('/profile');
 }
+export async function updatePortfolio(_previous: AuthState, form: FormData): Promise<AuthState> {
+  const client = await serverClient();
+  if (!client) return {message:'ยังไม่ได้ตั้งค่าฐานข้อมูล',error:true};
+  const handle = String(form.get('handle') ?? '').trim().toLowerCase();
+  const isPublic = form.get('isPublic') === 'on';
+  if (handle && !/^[a-z0-9_]{3,24}$/.test(handle)) return {message:'ชื่อลิงก์ใช้ a–z, 0–9 และ _ ยาว 3–24 ตัว',error:true};
+  if (isPublic && !handle) return {message:'ตั้งชื่อลิงก์ก่อนเปิดพอร์ตโฟลิโอสาธารณะ',error:true};
+  try {
+    const {data,error} = await client.auth.getUser();
+    if (error || !data.user) return {message:'กรุณาเข้าสู่ระบบใหม่ก่อนบันทึก',error:true};
+    const result = await client.from('profiles').update({handle:handle || null,is_public:isPublic}).eq('user_id',data.user.id).select('handle').single();
+    if (result.error?.code === '23505') return {message:'ชื่อลิงก์นี้มีคนใช้แล้ว ลองชื่ออื่น',error:true};
+    if (result.error || !result.data) return {message:'บันทึกไม่สำเร็จ กรุณาลองใหม่',error:true};
+    return {message:isPublic ? 'เปิดพอร์ตโฟลิโอแล้ว แชร์ลิงก์ได้เลย' : 'บันทึกแล้ว พอร์ตโฟลิโอยังเป็นส่วนตัว',error:false};
+  } catch { return {message:'บันทึกไม่สำเร็จ กรุณาลองใหม่',error:true}; }
+}

@@ -6,6 +6,7 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { PlayerHud } from "@/features/character/player-hud";
 import { LevelUp } from "@/features/character/level-up";
 import { BadgeToast } from "@/features/character/badge-grid";
+import { PendingGoal } from "@/features/onboarding/path-finder-quiz";
 type MenuItem = { href: string; label: string; icon: IconName; tab?: boolean; short?: string };
 // Grouped sidebar menu; `tab` items also appear in the mobile bottom bar, the rest live under "เพิ่มเติม".
 const groups: { title: string; items: MenuItem[] }[] = [
@@ -20,6 +21,7 @@ const groups: { title: string; items: MenuItem[] }[] = [
   { title: "ตัวละคร", items: [
     { href: "/character", label: "ตัวละคร", icon: "person", tab: true },
     { href: "/shop", label: "ร้านค้า", icon: "bag" },
+    { href: "/guild", label: "กิลด์", icon: "flame" },
   ] },
   { title: "ช่วยเหลือ", items: [
     { href: "/chat", label: "ผู้ช่วย AI", icon: "chat" },
@@ -36,7 +38,8 @@ function NavLink({ item, pathname, className, short = false }: { item: MenuItem;
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const more = useRef<HTMLDetailsElement>(null);
   useEffect(() => { if (more.current) more.current.open = false; }, [pathname]);
-  if (pathname === '/login' || pathname.startsWith('/login/')) return <>{children}</>;
+  // Sign-in, the guest landing, the path finder and public portfolios stand on their own without the game menu.
+  if (pathname === '/' || pathname === '/start' || pathname === '/login' || pathname.startsWith('/login/') || pathname.startsWith('/u/')) return <>{children}</>;
   if (/^\/quests\/[^/]+\/focus$/.test(pathname)) {
     return <div className="focus-shell"><a className="skip-link" href="#main">ข้ามไปเนื้อหา</a><main id="main" tabIndex={-1}>{children}</main></div>;
   }
@@ -59,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="workspace">
       <header className="topbar"><Link className="topbar-brand" href="/today"><Icon name="leaf" />liferpg<span>.</span></Link><PlayerHud /></header>
       <main id="main" tabIndex={-1}>{children}</main>
-      <LevelUp /><BadgeToast />
+      <LevelUp /><BadgeToast /><PendingGoal />
       <footer className="page-footer">เติบโตทีละก้าว ในจังหวะของคุณ <Link href="/credits">เครดิตเพลงและภาพ</Link></footer>
     </div>
   </div>;

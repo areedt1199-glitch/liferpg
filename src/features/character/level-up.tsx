@@ -4,6 +4,7 @@ import { levelStats, practiceStreak } from "@/features/journey/progress";
 import { progressNow, useProgress } from "@/features/journey/progress-store";
 import { usePref, useStoredValue, writePref } from "@/features/boss/prefs";
 import { CharacterAvatar } from "./character-avatar";
+import { ShareProgress } from "@/features/social/share-progress";
 
 const ONOFF = ["on", "off"] as const;
 function fanfare() {
@@ -61,6 +62,7 @@ export function LevelUp() {
         <div><dt>ฝึกต่อเนื่อง</dt><dd>{streak} วัน</dd></div>
       </dl>
       <button ref={button} type="button" className="primary-link" onClick={close}>เดินทางต่อ →</button>
+      <ShareProgress text={`ฉันเลเวลอัปเป็น Lv.${level} ใน liferpg แล้ว!`} />
     </div>
   </div>;
 }

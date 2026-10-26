@@ -14,6 +14,7 @@ import { items, skinById, skinImage, STARTER_SKIN, type ItemId } from '../shop/c
 import { inventory, reviewPassed } from '../journey/progress';
 import { spendItem, submitBoss, useProgress } from '../journey/progress-store';
 import type { Quest } from '../quests/types';
+import { ShareProgress } from '../social/share-progress';
 
 type Float = { id: number; text: string; kind: 'boss' | 'crit' | 'player' };
 type Fx = { player: Mode; boss: Mode; playerFlash: boolean; bossFlash: boolean; playerMove: string; bossMove: string; shake: boolean };
@@ -162,6 +163,7 @@ export function BossBattle({ quest }: { quest: Quest }) {
           {save === 'failed' && <button type="button" className="primary-link" onClick={() => void saveResult(battle.answers)}>ลองบันทึกผลอีกครั้ง</button>}
           <button type="button" className={save === 'failed' ? 'text-link' : 'primary-link'} onClick={start}>{battle.phase === 'victory' ? 'สู้อีกครั้ง (ฝึกซ้อม)' : 'สู้ใหม่'}</button>
         </div>
+        {battle.phase === 'victory' && save === 'saved' && <ShareProgress text={`ฉันล้ม${boss.name}ได้แล้วใน liferpg!`} />}
       </div>}
     </div>
 

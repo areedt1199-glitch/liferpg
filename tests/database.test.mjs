@@ -63,7 +63,7 @@ test('SQL migrations, seed replay, RLS ownership, grants and helper restrictions
    await assert.rejects(()=>asUser(db,A,tx=>tx.exec(sql)),undefined,sql);
   await assert.rejects(()=>asUser(db,'',tx=>snapshot(tx)),/AUTH_REQUIRED/);
   const tables=(await db.query("select relname,relrowsecurity from pg_class join pg_namespace on pg_namespace.oid=relnamespace where nspname='public' and relkind='r'")).rows;
-  assert.equal(tables.length,27); assert.ok(tables.every(t=>t.relrowsecurity));
+  assert.equal(tables.length,29); assert.ok(tables.every(t=>t.relrowsecurity));
  } finally {await db.close();}
 });
 test('SQL atomic completion uses server rewards, checklist and unique ledger; retries preserve elapsed',async()=>{
@@ -366,5 +366,41 @@ test('SQL daily plan: validated slots per day, owner-only, done toggle and remov
   p=await asUser(db,A,tx=>command(tx,'plan_remove',{id:id(1)}));assert.equal(p.progress.plans.some(x=>x.id===id(1)),false);accept(p);
   assert.equal((await asUser(db,B,tx=>tx.query('select * from public.plan_items where user_id=$1',[A]))).rows.length,0);
   await assert.rejects(()=>asUser(db,A,tx=>tx.exec("delete from public.plan_items")));
+ }finally{await db.close();}
+});
+test('SQL social: portfolios are opt-in and read-only to anyone, guilds need a code and members only see their own board',async()=>{
+ const db=await database();
+ try{
+  const guild=(tx,action,payload={})=>tx.query('select public.liferpg_guild($1,$2::jsonb) as value',[action,JSON.stringify(payload)]).then(r=>r.rows[0].value);
+  const portfolio=async(role,h)=>db.transaction(async tx=>{await tx.exec(`set local role ${role}`);return (await tx.query('select public.liferpg_portfolio($1) as value',[h])).rows[0].value;});
+  await asUser(db,A,async tx=>{await command(tx,'add_goal',{goalId:'python'});await command(tx,'start_quest',{questId:'python.python_syntax'});await fullChecklistAndBoss(tx,'python.python_syntax');await command(tx,'complete',{questId:'python.python_syntax'});});
+  await asUser(db,B,tx=>snapshot(tx));
+  // Private until the player publishes; handles are validated and unique.
+  await asUser(db,A,tx=>tx.query("update public.profiles set handle='leaf_a' where user_id=auth.uid()"));
+  assert.equal(await portfolio('anon','leaf_a'),null);
+  await assert.rejects(()=>asUser(db,B,tx=>tx.query("update public.profiles set handle='leaf_a' where user_id=auth.uid()")));
+  await assert.rejects(()=>asUser(db,B,tx=>tx.query("update public.profiles set handle='No Spaces!' where user_id=auth.uid()")));
+  await assert.rejects(()=>asUser(db,B,tx=>tx.query("update public.profiles set is_public=true where user_id=auth.uid()")),/public_needs_handle/);
+  assert.equal((await asUser(db,B,tx=>tx.query("update public.profiles set is_public=true where user_id=$1 returning user_id",[A]))).rows.length,0);
+  await asUser(db,A,tx=>tx.query("update public.profiles set is_public=true where user_id=auth.uid()"));
+  const pub=await portfolio('anon','LEAF_A');
+  assert.equal(pub.handle,'leaf_a');assert.equal(pub.quests.length,1);assert.equal(pub.quests[0].questId,'python.python_syntax');assert.equal(pub.quests[0].reviewed,true);
+  assert.equal(pub.goals[0].goalId,'python');assert.equal(pub.goals[0].done,1);assert.equal(pub.bosses,1);assert.ok(pub.totalXP>0);
+  assert.equal('coins' in pub || 'journal' in pub,false);
+  // Guilds: tables are closed; create/join by code, weekly board for members only.
+  await assert.rejects(()=>asUser(db,B,tx=>tx.query('select * from public.guilds')));
+  await assert.rejects(()=>portfolio('anon','x').then(()=>db.transaction(async tx=>{await tx.exec('set local role anon');await tx.query("select public.liferpg_guild('list','{}')");})));
+  const made=await asUser(db,A,tx=>guild(tx,'create',{name:'ห้อง ม.5/1'}));
+  const code=made.guilds[0].code;assert.match(code,/^[A-HJ-NP-Z2-9]{6}$/);assert.equal(made.guilds[0].isOwner,true);
+  await assert.rejects(()=>asUser(db,B,tx=>guild(tx,'board',{id:made.id})),/GUILD_NOT_MEMBER/);
+  await assert.rejects(()=>asUser(db,B,tx=>guild(tx,'join',{code:'ZZZZZZ'})),/GUILD_NOT_FOUND/);
+  const joined=await asUser(db,B,tx=>guild(tx,'join',{code:code.toLowerCase()}));assert.equal(joined.guilds[0].members,2);
+  const board=await asUser(db,B,tx=>guild(tx,'board',{id:made.id}));
+  assert.equal(board.members.length,2);assert.equal(board.members[0].handle,'leaf_a');assert.ok(board.members[0].weekXP>0);assert.equal(board.members[1].isMe,true);
+  // The owner leaving hands the guild over; the last member leaving removes it.
+  await asUser(db,A,tx=>guild(tx,'leave',{id:made.id}));
+  assert.equal((await asUser(db,B,tx=>guild(tx,'list'))).guilds[0].isOwner,true);
+  await asUser(db,B,tx=>guild(tx,'leave',{id:made.id}));
+  assert.equal((await db.query('select count(*)::int as n from public.guilds')).rows[0].n,0);
  }finally{await db.close();}
 });
