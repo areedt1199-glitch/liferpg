@@ -23,7 +23,7 @@ export default async function PortfolioPage({ params }: Props) {
   if (!p) notFound();
   const path = `/u/${p.handle}`;
   return <div className="portfolio-page">
-    <header className="landing-bar"><Link className="landing-logo" href="/"><Icon name="leaf" />liferpg<span>.</span></Link><Link className="primary-link portfolio-cta-small" href="/start">เริ่มผจญภัยของคุณ</Link></header>
+    <header className="landing-bar"><Link className="landing-logo" href="/"><Icon name="leaf" />liferpg<span>.</span></Link><Link className="primary-link portfolio-cta-small" href="/start">เริ่มผจญภัย</Link></header>
     <main className="portfolio-wrap">
       <section className="portfolio-hero">
         <div className="character-portrait"><img src={skinImage(p.skinId)} alt="" /></div>

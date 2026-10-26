@@ -53,7 +53,7 @@ export function GuildHall({ joinCode }: { joinCode: string }) {
     {guilds && guilds.length > 0 && <nav className="guild-tabs" aria-label="กิลด์ของฉัน">{guilds.map(g => <button key={g.id} type="button" className={g.id === selected ? 'active' : ''} aria-pressed={g.id === selected} onClick={() => setSelected(g.id)}>{g.name}<span>{g.members} คน</span></button>)}</nav>}
     {shown && <section className="guild-board" aria-labelledby="guild-name">
       <div className="guild-board-head">
-        <div><p className="eyebrow">WEEKLY RANKING · ตั้งแต่จันทร์ {weekLabel}</p><h2 id="guild-name">{shown.name}</h2></div>
+        <div><p className="eyebrow">WEEKLY RANKING</p><h2 id="guild-name">{shown.name}</h2><p className="muted">นับ XP ตั้งแต่วันจันทร์ {weekLabel}</p></div>
         <div className="guild-invite"><span>รหัสเข้ากิลด์</span><strong>{shown.code}</strong><ShareButton path={`/guild?join=${shown.code}`} title={`กิลด์ ${shown.name}`} text={`มาเข้ากิลด์ “${shown.name}” ใน liferpg ด้วยกัน รหัส ${shown.code}`} label="ชวนเพื่อน" /></div>
       </div>
       <ol className="guild-ranks">{shown.members.map((m, i) => <li key={`${m.name}-${i}`} className={m.isMe ? 'me' : ''}>

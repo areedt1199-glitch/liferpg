@@ -1233,7 +1233,7 @@ h2, h3 { font-family: var(--font-display), var(--font-sans); }
 .finder-more { margin-top: 18px; color: var(--muted); }
 .finder-more button { background: none; border: 0; font-family: inherit; cursor: pointer; }
 
-.portfolio-cta-small { margin-top: 0; padding: 10px 16px; min-height: 40px; border-radius: 999px; }
+.portfolio-cta-small { margin-top: 0; padding: 10px 16px; min-height: 40px; border-radius: 999px; white-space: nowrap; }
 .portfolio-wrap { max-width: 880px; margin: 0 auto; padding: 8px 16px 32px; }
 .portfolio-hero { display: flex; gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--frame-soft); border-radius: 24px; padding: 26px; box-shadow: var(--shadow-sm); }
 .portfolio-hero .character-portrait { width: 150px; margin: 0; }

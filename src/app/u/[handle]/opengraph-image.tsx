@@ -19,7 +19,8 @@ export default async function Image({ params }: { params: Promise<{ handle: stri
   const goals = p ? p.goals.slice(0, 3).map(g => `${g.title} ${g.done}/${g.total}`) : ['เรียนสายเทคแบบเล่นเกม RPG'];
   const skin = skinById(p?.skinId ?? '') ? p!.skinId : STARTER_SKIN;
   const sprite = `data:image/png;base64,${(await readFile(join(process.cwd(), 'public', 'images', 'skins', `${skin}.png`))).toString('base64')}`;
-  const text = [name, 'ADVENTURER liferpg Lv. XP', ...stats.map(s => `${s[0]}${s[1]}`), ...goals, 'ออกผจญภัยไปด้วยกันใน liferpg'].join(' ');
+  // Digits are listed in full: numbers are rendered from this subset too.
+  const text = [name, 'ADVENTURER liferpg Lv. XP 0123456789,/', ...stats.map(s => `${s[0]}${s[1]}`), ...goals, 'ออกผจญภัยไปด้วยกันใน liferpg'].join(' ');
   const fonts = (await Promise.all([thaiFont(text, 400), thaiFont(text, 700)])).filter(f => f !== null);
   return new ImageResponse(
     <div style={{ width: '100%', height: '100%', display: 'flex', background: 'linear-gradient(135deg,#0f2b23,#173e32 55%,#285444)', color: '#fffdf7', fontFamily: 'Noto Sans Thai', padding: 64 }}>
