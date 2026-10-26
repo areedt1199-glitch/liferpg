@@ -12,7 +12,7 @@ import { FantasyForest } from '@/features/account/fantasy-forest';
 // A looping clip placed here replaces the animated illustration; nothing is loaded from other sites.
 const VIDEO = '/images/login/forest.mp4';
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ auth?: string; signup?: string }> }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ auth?: string; signup?: string; forgot?: string }> }) {
   const configured = !!supabaseConfig();
   const client = await serverClient();
   if (client) {
@@ -27,7 +27,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <Link className="login-logo" href="/today"><Icon name="leaf" />liferpg<span>.</span></Link>
       <div className="login-column">
         <span className="login-emblem" aria-hidden="true"><Icon name="leaf" /></span>
-        {configured ? <LoginForms startWithSignup={query.signup === '1'} authError={query.auth === 'error'} /> : <div className="login-unconfigured"><h1>ยังไม่ได้ตั้งค่าฐานข้อมูล</h1><p>ตั้งค่า Supabase ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ ระหว่างนี้ลองเล่นแบบ demo ได้</p></div>}
+        {configured ? <LoginForms startWithSignup={query.signup === '1'} startWithForgot={query.forgot === '1'} authError={query.auth === 'error'} /> : <div className="login-unconfigured"><h1>ยังไม่ได้ตั้งค่าฐานข้อมูล</h1><p>ตั้งค่า Supabase ตามคู่มือก่อนสมัครหรือเข้าสู่ระบบ ระหว่างนี้ลองเล่นแบบ demo ได้</p></div>}
         <div className="login-or"><span>หรือ</span></div>
         <form action={enterDemo}><button type="submit" className="login-demo">ลองเล่นแบบ demo ในเบราว์เซอร์นี้</button></form>
         <p className="login-fine">ข้อมูล demo เก็บในเครื่องนี้เท่านั้น แยกจากบัญชีจริง</p>

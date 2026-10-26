@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
     try {
       const {error}=await client.auth.exchangeCodeForSession(code);
       if (!error) {
-        const response=NextResponse.redirect(new URL('/profile',requestOrigin(request)));
+        // A password-reset email lands here too; only that one fixed destination is honoured.
+        const next=request.nextUrl.searchParams.get('next')==='reset'?'/login/reset':'/profile';
+        const response=NextResponse.redirect(new URL(next,requestOrigin(request)));
         response.cookies.set('liferpg-mode','account',{httpOnly:true,sameSite:'lax',path:'/'});
         response.headers.set('Cache-Control','private, no-store'); return response;
       }

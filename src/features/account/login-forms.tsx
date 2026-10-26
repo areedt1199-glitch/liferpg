@@ -2,16 +2,18 @@
 import { useActionState, useState, type FormEvent } from 'react';
 import { authenticate, signInWithGoogle } from './actions';
 import { emptyAuthState } from './messages';
+import { ForgotPasswordForm } from './password-forms';
 import { clearAccountView, notifyAccountChanged } from '@/features/journey/progress-store';
 
 /** Minimal sign-in / sign-up form for the /login page. */
-export function LoginForms({ startWithSignup = false, authError = false }: { startWithSignup?: boolean; authError?: boolean }) {
+export function LoginForms({ startWithSignup = false, startWithForgot = false, authError = false }: { startWithSignup?: boolean; startWithForgot?: boolean; authError?: boolean }) {
   const [authState, authAction, authPending] = useActionState(authenticate, emptyAuthState);
   const [googleState, googleAction, googlePending] = useActionState(signInWithGoogle, emptyAuthState);
   const [signup, setSignup] = useState(startWithSignup);
   const [showPw, setShowPw] = useState(false);
   const [formError, setFormError] = useState('');
   const [submittedMode, setSubmittedMode] = useState<boolean | null>(null);
+  const [forgot, setForgot] = useState(startWithForgot);
   const switchTo = (next: boolean) => { setSignup(next); setFormError(''); setShowPw(false); };
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -24,6 +26,8 @@ export function LoginForms({ startWithSignup = false, authError = false }: { sta
     setFormError(''); setSubmittedMode(signup);
     clearAccountView(); notifyAccountChanged();
   }
+
+  if (forgot) return <ForgotPasswordForm onBack={() => setForgot(false)} />;
 
   return <>
     <h1 className="login-title">{signup ? 'เริ่มการผจญภัย' : 'ยินดีต้อนรับกลับ'}</h1>
@@ -44,6 +48,7 @@ export function LoginForms({ startWithSignup = false, authError = false }: { sta
       <label className="login-field"><span>รหัสผ่าน</span>
         <span className="login-password"><input name="password" type={showPw ? 'text' : 'password'} placeholder="อย่างน้อย 8 ตัวอักษร" autoComplete={signup ? 'new-password' : 'current-password'} minLength={8} required disabled={authPending} />
           <button type="button" className="login-reveal" onClick={() => setShowPw(v => !v)} aria-pressed={showPw}>{showPw ? 'ซ่อน' : 'แสดง'}</button></span></label>
+      {!signup && <button type="button" className="login-forgot" onClick={() => setForgot(true)}>ลืมรหัสผ่าน?</button>}
       {signup && <label className="login-field"><span>ยืนยันรหัสผ่าน</span>
         <input name="confirmPassword" type={showPw ? 'text' : 'password'} placeholder="พิมพ์รหัสผ่านอีกครั้ง" autoComplete="new-password" minLength={8} required disabled={authPending} /></label>}
       {formError && <p className="login-alert" role="alert">{formError}</p>}

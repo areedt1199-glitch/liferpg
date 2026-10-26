@@ -48,3 +48,6 @@ next-env.d.ts
 # local tooling
 .idea/
 supabase/.temp/
+
+.vercel
+.env*

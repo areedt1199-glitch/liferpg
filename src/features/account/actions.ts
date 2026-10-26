@@ -64,3 +64,32 @@ export async function updateName(_previous: AuthState, form: FormData): Promise<
 }
 export async function enterDemo() { (await cookies()).set('liferpg-mode','demo',{httpOnly:true,sameSite:'lax',path:'/'}); redirect('/today'); }
 export async function enterAccount() { await accountMode(); redirect('/profile'); }
+export async function requestPasswordReset(_previous: AuthState, form: FormData): Promise<AuthState> {
+  const client = await serverClient();
+  if (!client) return {message:'ยังไม่ได้ตั้งค่าฐานข้อมูล',error:true};
+  const email = String(form.get('email') ?? '').trim();
+  if (!email || email.length > 254) return {message:'กรอกอีเมลที่ใช้สมัคร',error:true};
+  try {
+    const origin = (await headers()).get('origin');
+    if (!origin || !['http:','https:'].includes(new URL(origin).protocol)) return {message:'เปิดแบบฟอร์มจากเว็บไซต์ liferpg แล้วลองใหม่',error:true};
+    const {error} = await client.auth.resetPasswordForEmail(email,{redirectTo:`${origin}/auth/callback?next=reset`});
+    // Unknown addresses get the same answer so the form can't be used to probe who has an account.
+    if (error && (error.code === 'over_request_rate_limit' || error.code === 'over_email_send_rate_limit')) return {message:authMessage(error.code),error:true};
+  } catch { return {message:authMessage(),error:true}; }
+  return {message:'ถ้าอีเมลนี้มีบัญชี เราส่งลิงก์ตั้งรหัสผ่านใหม่ไปแล้ว ตรวจกล่องอีเมล (และโฟลเดอร์สแปม)',error:false};
+}
+export async function updatePassword(_previous: AuthState, form: FormData): Promise<AuthState> {
+  const client = await serverClient();
+  if (!client) return {message:'ยังไม่ได้ตั้งค่าฐานข้อมูล',error:true};
+  const password = String(form.get('password') ?? '');
+  if (password !== String(form.get('confirmPassword') ?? '')) return {message:'รหัสผ่านทั้งสองช่องไม่ตรงกัน กรุณาตรวจอีกครั้ง',error:true};
+  if (password.length < 8 || password.length > 1024) return {message:'ใช้รหัสผ่านอย่างน้อย 8 ตัวอักษร',error:true};
+  try {
+    const {data,error:identityError} = await client.auth.getUser();
+    if (identityError || !data.user) return {message:'ลิงก์หมดอายุแล้ว กรุณาขอลิงก์ตั้งรหัสผ่านใหม่อีกครั้ง',error:true};
+    const {error} = await client.auth.updateUser({password});
+    if (error) return {message:error.code === 'same_password' ? 'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม' : authMessage(error.code),error:true};
+    await accountMode();
+  } catch { return {message:authMessage(),error:true}; }
+  redirect('/profile');
+}

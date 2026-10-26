@@ -36,7 +36,7 @@ function NavLink({ item, pathname, className, short = false }: { item: MenuItem;
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const more = useRef<HTMLDetailsElement>(null);
   useEffect(() => { if (more.current) more.current.open = false; }, [pathname]);
-  if (pathname === '/login') return <>{children}</>;
+  if (pathname === '/login' || pathname.startsWith('/login/')) return <>{children}</>;
   if (/^\/quests\/[^/]+\/focus$/.test(pathname)) {
     return <div className="focus-shell"><a className="skip-link" href="#main">ข้ามไปเนื้อหา</a><main id="main" tabIndex={-1}>{children}</main></div>;
   }

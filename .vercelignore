@@ -1,0 +1,10 @@
+# Keep local secrets and dev-only material out of Vercel uploads.
+.env*
+!.env.example
+node_modules
+.next
+backups
+.idea
+supabase/.temp
+assets-src
+demo-submissions

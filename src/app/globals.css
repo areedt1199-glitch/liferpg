@@ -62,6 +62,10 @@ h1 { font-size: clamp(28px,3vw,38px); line-height: 1.4; font-weight: 600; letter
 .empty-state p { margin-top: 9px; color: var(--muted); font-size: 14px; }
 .quiet-label { display: inline-block; margin-top: 20px; padding: 5px 12px; color: #756747; background: #f4efdf; border-radius: 7px; font-size: 12px; }
 .standalone { margin-top: 34px; padding: 65px 22px; }
+.error-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: center; }
+.error-actions .primary-link { border: 0; font: inherit; font-size: 13px; cursor: pointer; }
+.error-home { margin-top: 23px; color: var(--forest); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.error-digest { font-size: 11px !important; opacity: .7; }
 .page-footer { width: 100%; max-width: 1200px; margin: 0 auto; padding: 22px 24px; display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
 .character-placeholder { width: 130px; height: 150px; position: relative; margin: 0 auto 24px; }
 .character-head { position: absolute; top: 15px; left: 45px; width: 40px; height: 40px; border-radius: 50%; background: #dfc395; border: 7px solid #6c7250; z-index: 2; }
@@ -861,6 +865,9 @@ button:disabled { opacity: .55; cursor: wait; }
 .login-submit { min-height: 50px; margin-top: 6px; border: 0; border-radius: 999px; background: #13201a; color: #fff; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
 .login-submit:hover:not(:disabled) { background: var(--forest); }
 .login-submit:disabled { opacity: .55; cursor: wait; }
+.login-link-button { display: flex; align-items: center; justify-content: center; margin-top: 18px; text-decoration: none; }
+.login-forgot { justify-self: end; margin-top: -6px; border: 0; background: none; padding: 4px 2px; min-height: 32px; color: var(--forest); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.login-forgot:hover { text-decoration: underline; text-underline-offset: 3px; }
 .login-or { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--muted); font-size: 13px; }
 .login-or::before, .login-or::after { content: ''; flex: 1; height: 1px; background: #e6e8e4; }
 .login-demo { width: 100%; min-height: 48px; border: 1px solid #dcdfdb; border-radius: 999px; background: #fff; color: var(--forest); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
