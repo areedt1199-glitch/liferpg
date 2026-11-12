@@ -1,0 +1,25 @@
+﻿[1] S. Deterding, D. Dixon, R. Khaled, and L. Nacke, “From game design elements to gamefulness: Defining ‘gamification’,” in Proc. 15th Int. Academic MindTrek Conf., Tampere, Finland, 2011, pp. 9–15, doi: 10.1145/2181037.2181040.
+[2] J. Hamari, J. Koivisto, and H. Sarsa, “Does gamification work? — A literature review of empirical studies on gamification,” in Proc. 47th Hawaii Int. Conf. System Sciences, 2014, pp. 3025–3034, doi: 10.1109/HICSS.2014.377.
+[3] J. Koivisto and J. Hamari, “The rise of motivational information systems: A review of gamification research,” Int. J. Inf. Manage., vol. 45, pp. 191–210, 2019, doi: 10.1016/j.ijinfomgt.2018.10.013.
+[4] M. Sailer and L. Homner, “The gamification of learning: A meta-analysis,” Educ. Psychol. Rev., vol. 32, no. 1, pp. 77–112, 2020, doi: 10.1007/s10648-019-09498-w.
+[5] S. Chinchua, T. Kantathanawat, and S. Tuntiwongwanich, “Increasing programming self-efficacy (PSE) through a problem-based gamification digital learning ecosystem (DLE) model,” J. High. Educ. Theory Pract., vol. 22, no. 9, 2022, doi: 10.33423/jhetp.v22i9.5370.
+[6] HabitRPG, Inc. “Habitica: Gamify your life.” [Online]. Available: https://habitica.com (accessed Nov. 10, 2026).
+[7] J. C. Paiva, J. P. Leal, and Á. Figueira, “Automated assessment in computer science education: A state-of-the-art review,” ACM Trans. Comput. Educ., vol. 22, no. 3, pp. 1–40, 2022, doi: 10.1145/3513140.
+[8] M. Messer, N. C. C. Brown, M. Kölling, and M. Shi, “Automated grading and feedback tools for programming education: A systematic review,” ACM Trans. Comput. Educ., vol. 24, no. 1, pp. 1–43, 2024, doi: 10.1145/3636515.
+[9] E. Kasneci et al., “ChatGPT for good? On opportunities and challenges of large language models for education,” Learn. Individ. Differ., vol. 103, Art. no. 102274, 2023, doi: 10.1016/j.lindif.2023.102274.
+[10] P. Denny et al., “Computing education in the era of generative AI,” Commun. ACM, vol. 67, no. 2, pp. 56–67, 2024, doi: 10.1145/3624720.
+[11] K. Greshake, S. Abdelnabi, S. Mishra, C. Endres, T. Holz, and M. Fritz, “Not what you’ve signed up for: Compromising real-world LLM-integrated applications with indirect prompt injection,” in Proc. 16th ACM Workshop on Artificial Intelligence and Security, 2023, pp. 79–90, doi: 10.1145/3605764.3623985.
+[12] R. M. Ryan and E. L. Deci, “Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being,” Amer. Psychologist, vol. 55, no. 1, pp. 68–78, 2000, doi: 10.1037/0003-066X.55.1.68.
+[13] J. Cisneros-González, N. Gordo-Herrera, I. Barcia-Santos, and J. Sánchez-Soriano, “JorGPT: Instructor-aided grading of programming assignments with large language models (LLMs),” Future Internet, vol. 17, no. 6, Art. no. 265, 2025, doi: 10.3390/fi17060265.
+[14] M. Jukiewicz, “A systematic comparison of large language models for automated assignment assessment in programming education: Exploring the importance of architecture and vendor,” arXiv:2509.26483, 2025, doi: 10.48550/arXiv.2509.26483.
+[15] L. Zheng et al., “Judging LLM-as-a-judge with MT-Bench and Chatbot Arena,” in Advances in Neural Information Processing Systems 36 (NeurIPS 2023), 2023, doi: 10.48550/arXiv.2306.05685.
+[16] M. Liffiton, B. E. Sheese, J. Savelka, and P. Denny, “CodeHelp: Using large language models with guardrails for scalable support in programming classes,” in Proc. 23rd Koli Calling Int. Conf. Computing Education Research, 2023, pp. 1–11, doi: 10.1145/3631802.3631830.
+[17] Duolingo, Inc. “Duolingo.” [Online]. Available: https://www.duolingo.com (accessed Nov. 10, 2026).
+[18] Seekrtech. “Forest: Stay focused, be present.” [Online]. Available: https://www.forestapp.cc (accessed Nov. 10, 2026).
+[19] The PostgreSQL Global Development Group. “Row security policies,” PostgreSQL Documentation. [Online]. Available: https://www.postgresql.org/docs/current/ddl-rowsecurity.html (accessed Nov. 10, 2026).
+[20] Google. “Gemini API additional terms of service.” [Online]. Available: https://aistudio.google.com/docs/terms (accessed Nov. 11, 2026).
+[21] J. Cohen, “A coefficient of agreement for nominal scales,” Educ. Psychol. Meas., vol. 20, no. 1, pp. 37–46, 1960, doi: 10.1177/001316446002000104.
+[22] E. B. Wilson, “Probable inference, the law of succession, and statistical inference,” J. Amer. Statist. Assoc., vol. 22, no. 158, pp. 209–212, 1927, doi: 10.1080/01621459.1927.10502953.
+[23] J. L. Fleiss, “Measuring nominal scale agreement among many raters,” Psychol. Bull., vol. 76, no. 5, pp. 378–382, 1971, doi: 10.1037/h0031619.
+[24] J. Brooke, “SUS: A ‘quick and dirty’ usability scale,” in Usability Evaluation in Industry. London, U.K.: CRC Press, 1996, pp. 207–212, doi: 10.1201/9781498710411-35.
+[25] M. Schrepp, A. Hinderks, and J. Thomaschewski, “Design and evaluation of a short version of the User Experience Questionnaire (UEQ-S),” Int. J. Interact. Multimed. Artif. Intell., vol. 4, no. 6, pp. 103–108, 2017, doi: 10.9781/ijimai.2017.09.001.

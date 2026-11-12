@@ -55,3 +55,10 @@ supabase/.temp/
 # Android app shell (mobile/): dependencies are installed locally
 mobile/node_modules/
 /submission/
+
+# Paper build intermediates
+/paper/pdf-build/
+/paper/preview.pdf
+/paper/build-v2.mjs.bak
+/paper/advisor-v2/
+/paper/liferpg-AUCC2027-v2.zip

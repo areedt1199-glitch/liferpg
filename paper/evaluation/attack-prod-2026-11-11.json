@@ -1,0 +1,77 @@
+{
+ "at": "2026-11-11T15:46:52.728Z",
+ "site": "https://liferpg-five-zeta.vercel.app",
+ "supabase": "ynxtoynvjgvxulvxxmxn",
+ "results": [
+  {
+   "id": "A1",
+   "attack": "อ่านตารางข้อมูลผู้ใช้ 20 ตารางโดยไม่ล็อกอิน",
+   "expected": "ไม่ได้ข้อมูลแถวใดเลย",
+   "observed": "0 แถวจากทั้ง 20 ตาราง",
+   "blocked": true
+  },
+  {
+   "id": "A2",
+   "attack": "อ่านเฉลยบอสใน schema private ผ่าน Data API",
+   "expected": "ถูกปฏิเสธ",
+   "observed": "HTTP 406 (PGRST106)",
+   "blocked": true
+  },
+  {
+   "id": "A3",
+   "attack": "ปลอมผลตรวจ \"pass\" ด้วยการเรียกฟังก์ชันบันทึกผลตรวจโดยตรง",
+   "expected": "ถูกปฏิเสธ (สิทธิ์ service role เท่านั้น)",
+   "observed": "HTTP 401 (42501)",
+   "blocked": true
+  },
+  {
+   "id": "A4",
+   "attack": "สั่งยืนยันด่านสำเร็จผ่าน RPC โดยไม่ล็อกอิน",
+   "expected": "ถูกปฏิเสธ",
+   "observed": "HTTP 401 (42501)",
+   "blocked": true
+  },
+  {
+   "id": "A5",
+   "attack": "เขียน XP และเหรียญลง reward_ledger โดยตรง",
+   "expected": "ถูกปฏิเสธโดยสิทธิ์ (ไม่ใช่เพราะข้อมูลผิดรูปแบบ)",
+   "observed": "HTTP 401 (42501)",
+   "blocked": true
+  },
+  {
+   "id": "A6",
+   "attack": "แก้ข้อมูลโปรไฟล์ผ่าน Data API โดยไม่ล็อกอิน",
+   "expected": "ถูกปฏิเสธหรือไม่มีแถวถูกแก้",
+   "observed": "HTTP 401 (42501)",
+   "blocked": true
+  },
+  {
+   "id": "A7",
+   "attack": "ส่งงานให้ AI ตรวจจากเว็บอื่น (Origin ปลอม) และสั่งเกมโดยไม่มี Origin",
+   "expected": "ถูกปฏิเสธ 403",
+   "observed": "review HTTP 403, progress HTTP 403",
+   "blocked": true
+  },
+  {
+   "id": "A8",
+   "attack": "เรียก API ตรวจงานและ API เกมจาก origin ที่ถูกต้องแต่ไม่มี session",
+   "expected": "ถูกปฏิเสธ 401",
+   "observed": "review HTTP 401, progress HTTP 401",
+   "blocked": true
+  },
+  {
+   "id": "A9",
+   "attack": "ส่งคำสั่งยืนยันด่านพร้อมกัน 20 คำขอ (RPC 10 + API 10)",
+   "expected": "ถูกปฏิเสธทุกคำขอ",
+   "observed": "สำเร็จ 0/20 (สถานะ 401)",
+   "blocked": true
+  },
+  {
+   "id": "A10",
+   "attack": "อ่านพอร์ตโฟลิโอสาธารณะแล้วหาข้อมูลส่วนตัว",
+   "expected": "มีเฉพาะข้อมูลที่ตั้งใจเปิดเผย",
+   "observed": "ฟิลด์: name, goals, bosses, handle, quests, skinId, totalXP, practiceDays",
+   "blocked": true
+  }
+ ]
+}
