@@ -106,13 +106,13 @@ const abstractTh = [
   v(R => `ผลการประเมินด้วยงานทดสอบสังเคราะห์ที่ร่างด้วย AI และมีเฉลย ${R.cases} ชิ้น ตรวจซ้ำ ${R.runs} รอบ ซึ่งผลตัดสินทั้งหมดมาจากแบบจำลอง ${answeredBy} พบว่าตัดสินตรงเฉลยทุกรอบ ${R.all.correct} จาก ${R.all.n} ชิ้น (${ci(R.all.acc)}) ตัดสินผ่านผิด ${R.all.falsePass} จาก ${R.all.nFail} ชิ้นที่ควรไม่ผ่าน (${ci(R.all.falsePassCI)}) ซึ่งทั้งหมดเป็นงานที่เกือบครบ และตัดสินไม่ผ่านในงานที่แทรกคำสั่ง ${R.injection.blocked} จาก ${R.injection.n} ชิ้น `),
   'ผลนี้ชี้ความเป็นไปได้ทางเทคนิคเฉพาะโจทย์พื้นฐานที่ทดสอบ ยังไม่ได้วัดผลด้านการเรียนรู้หรือแรงจูงใจของผู้เรียน',
 ].join('');
-const keywordsTh = 'เกมิฟิเคชัน, แบบจำลองภาษาขนาดใหญ่, การตรวจงานอัตโนมัติ, การศึกษาด้านคอมพิวเตอร์, การแทรกคำสั่ง';
+const keywordsTh = 'แบบจำลองภาษาขนาดใหญ่, LLM ในฐานะผู้ตัดสิน, การตรวจงานอัตโนมัติ, การแทรกพรอมต์, เกมิฟิเคชัน';
 const abstractEn = [
   'Many gamified learning applications grant rewards as soon as learners mark a task as done, so points do not show whether any work was performed. This paper presents liferpg, a role-playing game application for practicing AI, software development and game development skills through 43 learning paths plus one starter path, in which a large language model reviewer checks submitted evidence against each level’s success criteria before a reward is unlocked, and all rewards are computed inside a database protected by row level security. ',
   v(R => `On ${R.cases} labelled, AI-drafted synthetic submissions reviewed ${R.runs} times, with every verdict produced by ${answeredBy}, the reviewer matched the label in every round for ${R.all.correct} of ${R.all.n} submissions (${ciEn(R.all.acc)}), passed ${R.all.falsePass} of ${R.all.nFail} submissions that should fail (${ciEn(R.all.falsePassCI)}), all of them nearly complete work, and failed ${R.injection.blocked} of ${R.injection.n} prompt-injection submissions. `),
   'These results indicate technical feasibility for the basic tasks tested only; learning and motivational outcomes were not measured.',
 ].join('');
-const keywordsEn = 'gamification, large language models, automated assessment, computing education, prompt injection';
+const keywordsEn = 'large language models, LLM-as-a-judge, automated assessment, prompt injection, gamification';
 
 // ---------- 1. Introduction
 h1('1. บทนำ');
