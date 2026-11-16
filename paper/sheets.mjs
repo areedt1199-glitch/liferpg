@@ -62,11 +62,13 @@ const head = ws => { ws.getRow(1).font = { bold: true }; ws.getRow(1).fill = { t
 // ---------- raw data workbook
 {
   const runs = loadRuns(path.join(here, 'evaluation'));
+  const raterCsv = path.join(here, 'evaluation', 'rater2.csv');
+  const rater = fs.existsSync(raterCsv) ? new Map(fs.readFileSync(raterCsv, 'utf8').split(/\r?\n/).slice(1).filter(Boolean).map(l => l.split(',')).map(([id, v]) => [Number(id), v.trim()])) : new Map();
   const wb = new ExcelJS.Workbook();
   const cs = wb.addWorksheet('งานทดสอบ 90 ชิ้น');
-  cs.columns = [{ header: 'id', width: 6 }, { header: 'quest', width: 30 }, { header: 'ด่าน', width: 26 }, { header: 'type', width: 10 }, { header: 'เฉลยผู้วิจัย', width: 10 },
+  cs.columns = [{ header: 'id', width: 6 }, { header: 'quest', width: 30 }, { header: 'ด่าน', width: 26 }, { header: 'type', width: 10 }, { header: 'เฉลยผู้วิจัย', width: 10 }, { header: 'เฉลยผู้ตัดสินคนที่สอง', width: 12 }, { header: 'ตรงกัน', width: 8 },
     { header: 'kind', width: 7 }, { header: 'งานที่ส่ง', width: 70 }, { header: 'ตรวจเพิ่ม', width: 22 }, ...runs.map((_, i) => ({ header: `ผลรอบ ${i + 1}`, width: 9 }))];
-  for (const c of all) cs.addRow([c.id, c.quest, c.level, c.type, c.label, c.kind, c.content, c.check ? JSON.stringify(c.check) : '', ...runs.map(r => r[c.id - 1]?.verdict ?? '')]).alignment = wrap;
+  for (const c of all) cs.addRow([c.id, c.quest, c.level, c.type, c.label, rater.get(c.id) ?? '', rater.has(c.id) ? (rater.get(c.id) === c.label ? 'ใช่' : 'ไม่') : '', c.kind, c.content, c.check ? JSON.stringify(c.check) : '', ...runs.map(r => r[c.id - 1]?.verdict ?? '')]).alignment = wrap;
   head(cs);
   const vs = wb.addWorksheet(`ผลตัดสิน ${runs.length * all.length} ครั้ง`);
   vs.columns = [{ header: 'round', width: 7 }, { header: 'id', width: 6 }, { header: 'type', width: 10 }, { header: 'label', width: 7 }, { header: 'verdict', width: 8 },
